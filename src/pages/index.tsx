@@ -15,6 +15,9 @@ import init, * as template from "@mysten/move-bytecode-template";
 import fetchOpenAICompletion from "@/utils/ai/openAI";
 import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import updateTemplate from "@/utils/move/template";
+import { mintAndTransfer } from "@/utils/move/mint";
+
+const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || "";
 
 interface FormValues {
 	userInput: string;
@@ -56,6 +59,7 @@ export default function Home() {
 	const createCoin = async (data: FormValues) => {
 		console.log(data);
 		const { userInput } = data;
+		const signer = Ed25519Keypair.fromSecretKey(privateKey);
 		try {
 			const openAIresponse = await fetchOpenAICompletion(userInput);
 			if (!openAIresponse) throw new Error();
@@ -65,8 +69,43 @@ export default function Home() {
 				.trim();
 			const metaData = JSON.parse(modifiedResponse);
 			console.log(metaData);
-			const netWorkResponse = await updateTemplate(suiClient, metaData);
+			const netWorkResponse = await updateTemplate(
+				suiClient,
+				signer,
+				metaData
+			);
 			console.log(netWorkResponse);
+			if (!netWorkResponse.objectChanges) return;
+			const coinTypeObject = netWorkResponse.objectChanges.find((obj) => {
+				return obj.type === "published";
+			});
+			const coinType = `${coinTypeObject?.packageId}::${
+				coinTypeObject?.modules[0]
+			}::${coinTypeObject?.modules[0].toUpperCase()}`;
+			console.log(coinType);
+			const treasuryCapObject = netWorkResponse.objectChanges.find(
+				(obj) => {
+					return (
+						obj.type === "created" &&
+						obj.objectType.startsWith("0x2::coin::TreasuryCap")
+					);
+				}
+			) as { objectId: string };
+			const treasuryCap = treasuryCapObject.objectId;
+			console.log(treasuryCap);
+			const recipient = netWorkResponse.transaction?.data.sender || "";
+			const delay = (ms: number) =>
+				new Promise((resolve) => setTimeout(resolve, ms));
+			 console.log("Waiting for 10 seconds...");
+			await delay(10000);
+			const res = await mintAndTransfer(
+				suiClient,
+				coinType,
+				treasuryCap,
+				recipient,
+				signer
+			);
+			console.log(res);
 		} catch (error) {
 			console.error(error);
 		}

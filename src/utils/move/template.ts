@@ -1,24 +1,28 @@
 import { templateHex } from "@/constants/move/template";
 import { bcs } from "@mysten/bcs";
-import { update_constants, update_identifiers } from "@mysten/move-bytecode-template";
+import {
+	update_constants,
+	update_identifiers,
+} from "@mysten/move-bytecode-template";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex, toBase64 } from "@mysten/sui/utils";
-import type { SuiClient } from '@mysten/sui/client';
+import type { SuiClient } from "@mysten/sui/client";
 import { MetaData } from "@/types/ai/metadata";
+import { Signer } from "@mysten/sui/cryptography";
 
-
-const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || "";
-
-const updateTemplate = async (suiClient: SuiClient, params: MetaData) => {
-	const signer = Ed25519Keypair.fromSecretKey(privateKey);
+const updateTemplate = async (
+	suiClient: SuiClient,
+	signer: Signer,
+	params: MetaData
+) => {
 	const address = signer.toSuiAddress();
 	const templateBytecode = fromHex(templateHex);
 
 	const { symbol, name, description } = params;
-     
-    let updated;
-    
+
+	let updated;
+
 	updated = update_identifiers(templateBytecode, {
 		TEMPLATE: symbol,
 		template: symbol.toLowerCase(),
@@ -72,12 +76,20 @@ const updateTemplate = async (suiClient: SuiClient, params: MetaData) => {
 	const response = await suiClient.signAndExecuteTransaction({
 		transaction: tx,
 		signer: signer,
-		options: { showEffects: true, showEvents: true },
+		options: {
+			showBalanceChanges: true,
+			showEffects: true,
+			showEvents: true,
+			showInput: true,
+			showObjectChanges: true,
+			showRawEffects: true,
+			showRawInput: true,
+		},
 	});
 
 	console.log("Template created successfully!");
-    return response;
+	return response;
 };
 
-
 export default updateTemplate;
+
