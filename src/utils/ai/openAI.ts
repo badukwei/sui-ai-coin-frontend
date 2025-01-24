@@ -1,39 +1,34 @@
-import OpenAI from "openai";
-import { openAISystemMessage } from "@/constants/ai/prompt";
-
-const openAIApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || "";
-
-const openai = new OpenAI({
-	apiKey: openAIApiKey,
-	dangerouslyAllowBrowser: true,
-});
+import { BACKEND } from "@/constants";
+import { Metadata, MetadataApiResponse } from "@/types/ai/metadata";
 
 /**
- * Fetch completion from OpenAI
- * @param {string} userContent - The user content to send to OpenAI.
- * @returns {Promise<string>} - The assistant's response.
+ * Fetch metadata from the /createMetadata API
+ * @param {string} content - The input content to send to the API.
+ * @returns {Promise<Metadata>} - The response containing the metadata.
  */
-const fetchOpenAICompletion = async (userContent: string): Promise<string> => {
-	const completion = await openai.chat.completions.create({
-		model: "gpt-4o-mini",
-		messages: [
-			{ role: "system", content: openAISystemMessage },
-			{ role: "user", content: userContent },
-		],
-		store: true,
-	});
+const fetchMetadata = async (content: string): Promise<Metadata> => {
+	try {
+		const response = await fetch(`${BACKEND}/openai/createMetadata`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ content }),
+		});
 
-	return completion.choices[0].message.content || "";
+		if (!response.ok) {
+			throw new Error(
+				`API error: ${response.status} ${response.statusText}`
+			);
+		}
+
+		const data: MetadataApiResponse = await response.json();
+		const metadata = data.message;
+		return metadata;
+	} catch (error) {
+		console.error("Error fetching metadata:", error);
+		throw error;
+	}
 };
 
-export default fetchOpenAICompletion;
-
-// Example usage:
-/*
-const userContent = "Write a haiku about recursion in programming.";
-fetchOpenAICompletion(userContent).then(response => {
-    console.log(response);
-}).catch(error => {
-    console.error("Error fetching OpenAI completion:", error);
-});
-*/
+export default fetchMetadata;

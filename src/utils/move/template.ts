@@ -4,17 +4,17 @@ import {
 	update_constants,
 	update_identifiers,
 } from "@mysten/move-bytecode-template";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex, toBase64 } from "@mysten/sui/utils";
 import type { SuiClient } from "@mysten/sui/client";
-import { MetaData } from "@/types/ai/metadata";
+import { Metadata } from "@/types/ai/metadata";
 import { Signer } from "@mysten/sui/cryptography";
 
 const updateTemplate = async (
 	suiClient: SuiClient,
 	signer: Signer,
-	params: MetaData
+	params: Metadata,
+	imageUrl: string,
 ) => {
 	const address = signer.toSuiAddress();
 	const templateBytecode = fromHex(templateHex);
@@ -27,14 +27,6 @@ const updateTemplate = async (
 		TEMPLATE: symbol,
 		template: symbol.toLowerCase(),
 	});
-
-	// // Update DECIMALS
-	// updated = update_constants(
-	// 	templateBytecode,
-	// 	bcs.u8().serialize(0).toBytes(),
-	// 	bcs.u8().serialize(0).toBytes(),
-	// 	"U8"
-	// );
 
 	// Update SYMBOL
 	updated = update_constants(
@@ -57,6 +49,14 @@ const updateTemplate = async (
 		updated,
 		bcs.string().serialize(description).toBytes(),
 		bcs.string().serialize("template_coin description").toBytes(),
+		"Vector(U8)"
+	);
+
+	// Update ICON_URL
+	updated = update_constants(
+		updated,
+		bcs.string().serialize(imageUrl).toBytes(),
+		bcs.string().serialize("template_icon_url").toBytes(),
 		"Vector(U8)"
 	);
 

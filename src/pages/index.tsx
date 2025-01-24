@@ -16,6 +16,13 @@ import fetchOpenAICompletion from "@/utils/ai/openAI";
 import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import updateTemplate from "@/utils/move/template";
 import { mintAndTransfer } from "@/utils/move/mint";
+import fetchMetadata from "@/utils/ai/openAI";
+import delay from "@/utils/common/delay";
+import {
+	formatCreateImagePrompt,
+	formatCreateTemplateResponse,
+} from "@/utils/move/format";
+import fetchImage from "@/utils/ai/falAI";
 
 const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || "";
 
@@ -61,43 +68,26 @@ export default function Home() {
 		const { userInput } = data;
 		const signer = Ed25519Keypair.fromSecretKey(privateKey);
 		try {
-			const openAIresponse = await fetchOpenAICompletion(userInput);
-			if (!openAIresponse) throw new Error();
-			const modifiedResponse = openAIresponse
-				.replace(/```json/g, "")
-				.replace(/```/g, "")
-				.trim();
-			const metaData = JSON.parse(modifiedResponse);
-			console.log(metaData);
+			const metadata = await fetchMetadata(userInput);
+			console.log(metadata);
+
+			const prompt = formatCreateImagePrompt(metadata);
+			const ImageUrl = await fetchImage(prompt);
+			console.log(ImageUrl);
+
 			const netWorkResponse = await updateTemplate(
 				suiClient,
 				signer,
-				metaData
+				metadata,
+				ImageUrl
 			);
 			console.log(netWorkResponse);
-			if (!netWorkResponse.objectChanges) return;
-			const coinTypeObject = netWorkResponse.objectChanges.find((obj) => {
-				return obj.type === "published";
-			});
-			const coinType = `${coinTypeObject?.packageId}::${
-				coinTypeObject?.modules[0]
-			}::${coinTypeObject?.modules[0].toUpperCase()}`;
-			console.log(coinType);
-			const treasuryCapObject = netWorkResponse.objectChanges.find(
-				(obj) => {
-					return (
-						obj.type === "created" &&
-						obj.objectType.startsWith("0x2::coin::TreasuryCap")
-					);
-				}
-			) as { objectId: string };
-			const treasuryCap = treasuryCapObject.objectId;
-			console.log(treasuryCap);
-			const recipient = netWorkResponse.transaction?.data.sender || "";
-			const delay = (ms: number) =>
-				new Promise((resolve) => setTimeout(resolve, ms));
-			 console.log("Waiting for 10 seconds...");
-			await delay(10000);
+			const { coinType, treasuryCap, recipient } =
+				formatCreateTemplateResponse(netWorkResponse);
+			if (!coinType || !treasuryCap || !recipient)
+				throw new Error(`API error: Fail create the coin`);
+			console.log("waiting creation...");
+			await delay(2000);
 			const res = await mintAndTransfer(
 				suiClient,
 				coinType,
