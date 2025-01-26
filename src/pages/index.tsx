@@ -12,18 +12,17 @@ import {
 } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
 import init from "@mysten/move-bytecode-template";
-import fetchOpenAICompletion from "@/utils/ai/openAI";
 import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import updateTemplate from "@/utils/move/template";
 import { mintAndTransfer } from "@/utils/move/mint";
 import fetchMetadata from "@/utils/ai/openAI";
-import delay from "@/utils/common/delay";
 import {
 	formatCreateImagePrompt,
 	formatCreateTemplateResponse,
 } from "@/utils/move/format";
 import fetchImage from "@/utils/ai/falAI";
-import { Transaction } from "@mysten/sui/transactions";
+import CustomConnectButton from "@/components/common/CustomConnectButton";
+import CustomDisconnectButton from "@/components/common/CustomDisconnectButton";
 
 interface FormValues {
 	userInput: string;
@@ -49,9 +48,8 @@ export default function Home() {
 
 	// sui
 	const suiClient = useSuiClient();
-	const { currentWallet, connectionStatus } = useCurrentWallet();
-	const address = currentWallet?.accounts?.[0].address;
-	const { mutate: disconnectWallet } = useDisconnectWallet();
+	const { currentWallet } = useCurrentWallet();
+	const address = currentWallet?.accounts?.[0]?.address;
 	const { mutateAsync: signAndExecuteTransaction } =
 		useSignAndExecuteTransaction({
 			execute: async ({ bytes, signature }) =>
@@ -118,23 +116,48 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-50">
+		<div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-darkblue to-black">
 			{/* Header */}
-			<header className="flex items-center justify-between w-full p-4 bg-white shadow-md">
-				<h1 className="text-lg font-bold text-gray-700">AI SUI MEME</h1>
-				<ConnectButton
-					style={{
-						paddingTop: "12px",
-						paddingRight: "24px",
-						paddingLeft: "24px",
-						paddingBottom: "12px", 
-					}}
-				/>
+			<header className="flex items-center justify-between w-full p-4 bg-transparent">
+				<h1 className="text-lg font-bold text-white">AI SUI MEME</h1>
+				<CustomConnectButton address={address} />
+				<CustomDisconnectButton address={address} />
 			</header>
 
 			{/* Main Content */}
-			<main className="flex items-center justify-center flex-1">
-				<div className="relative w-full max-w-2xl h-64 p-4 border border-gray-300 rounded-lg bg-white shadow-lg">
+			<main className="flex items-center flex-1 flex-col px-4 gap-20">
+				<section className="relative bg-gradient-to-b from-black via-darkblue to-black flex flex-col items-center justify-center text-center px-4">
+					{/* Hero Content */}
+					<div className="mt-20">
+						<h2 className="text-4xl lg:text-6xl font-extrabold text-white leading-tight">
+							Transform Your Ideas into Memecoins
+						</h2>
+						<p className="text-gray-400 text-lg lg:text-xl mt-4">
+							Simply enter your text, and our AI will help you
+							create a unique memecoin on the Sui blockchain.
+						</p>
+
+						<div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
+							<button className="px-6 py-3 text-lg font-medium bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+								Start Creating →
+							</button>
+							<button className="px-6 py-3 text-lg font-medium bg-transparent text-white border border-gray-500 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all">
+								Learn How It Works
+							</button>
+						</div>
+					</div>
+
+					{/* Hero Illustration */}
+					<div className="mt-16">
+						<div className="w-full max-w-3xl mx-auto bg-gradient-to-b from-gray-900 via-black to-gray-800 rounded-lg shadow-2xl p-10">
+							<p className="text-white text-lg">
+								Empowering creativity with AI and blockchain.
+								Your next viral token is just a few words away.
+							</p>
+						</div>
+					</div>
+				</section>
+				<section className="relative w-full max-w-3xl h-32 p-4 border border-gray-600 rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-lg">
 					{/* Textarea */}
 					<form onSubmit={handleSubmit(createCoin)}>
 						<Controller
@@ -143,7 +166,7 @@ export default function Home() {
 							render={({ field }) => (
 								<textarea
 									placeholder="Type your message here..."
-									className="w-full h-full p-4 pr-12 border-none focus:outline-none resize-none font-sans text-gray-800"
+									className="w-full h-full p-4 pr-12 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
 									value={field.value}
 									onChange={field.onChange}
 								></textarea>
@@ -153,13 +176,13 @@ export default function Home() {
 						{/* Send Button */}
 						<button
 							type="submit"
-							className="absolute bottom-4 right-4 flex items-center justify-center w-10 h-10 text-white bg-blue-500 rounded-full shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+							className="absolute bottom-4 right-4 flex items-center justify-center w-10 h-10 text-white bg-gradient-to-br from-blue-500 to-blue-700 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 							aria-label="Send"
 						>
 							<FaArrowRight size={16} />
 						</button>
 					</form>
-				</div>
+				</section>
 			</main>
 		</div>
 	);
