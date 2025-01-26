@@ -5,7 +5,7 @@ import {
 	SuiClientProvider,
 	WalletProvider,
 } from "@mysten/dapp-kit";
-import { getFullnodeUrl, type SuiClientOptions } from "@mysten/sui/client";
+import { getFullnodeUrl } from "@mysten/sui/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();

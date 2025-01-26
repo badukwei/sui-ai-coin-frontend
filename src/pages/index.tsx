@@ -11,7 +11,7 @@ import {
 	useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
-import init, * as template from "@mysten/move-bytecode-template";
+import init from "@mysten/move-bytecode-template";
 import fetchOpenAICompletion from "@/utils/ai/openAI";
 import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import updateTemplate from "@/utils/move/template";
@@ -23,8 +23,7 @@ import {
 	formatCreateTemplateResponse,
 } from "@/utils/move/format";
 import fetchImage from "@/utils/ai/falAI";
-
-const privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY || "";
+import { Transaction } from "@mysten/sui/transactions";
 
 interface FormValues {
 	userInput: string;
@@ -32,6 +31,7 @@ interface FormValues {
 
 export default function Home() {
 	// states
+	// form control
 	const {
 		handleSubmit,
 		control,
@@ -49,6 +49,26 @@ export default function Home() {
 
 	// sui
 	const suiClient = useSuiClient();
+	const { currentWallet, connectionStatus } = useCurrentWallet();
+	const address = currentWallet?.accounts?.[0].address;
+	const { mutate: disconnectWallet } = useDisconnectWallet();
+	const { mutateAsync: signAndExecuteTransaction } =
+		useSignAndExecuteTransaction({
+			execute: async ({ bytes, signature }) =>
+				await suiClient.executeTransactionBlock({
+					transactionBlock: bytes,
+					signature,
+					options: {
+						showBalanceChanges: true,
+						showEffects: true,
+						showEvents: true,
+						showInput: true,
+						showObjectChanges: true,
+						showRawEffects: true,
+						showRawInput: true,
+					},
+				}),
+		});
 
 	useEffect(() => {
 		const initWasm = async () => {
@@ -64,9 +84,8 @@ export default function Home() {
 	}, []);
 
 	const createCoin = async (data: FormValues) => {
-		console.log(data);
 		const { userInput } = data;
-		const signer = Ed25519Keypair.fromSecretKey(privateKey);
+		if (!userInput || !address) return;
 		try {
 			const metadata = await fetchMetadata(userInput);
 			console.log(metadata);
@@ -76,26 +95,23 @@ export default function Home() {
 			console.log(ImageUrl);
 
 			const netWorkResponse = await updateTemplate(
-				suiClient,
-				signer,
+				address,
 				metadata,
-				ImageUrl
+				ImageUrl,
+				signAndExecuteTransaction
 			);
 			console.log(netWorkResponse);
 			const { coinType, treasuryCap, recipient } =
 				formatCreateTemplateResponse(netWorkResponse);
 			if (!coinType || !treasuryCap || !recipient)
 				throw new Error(`API error: Fail create the coin`);
-			console.log("waiting creation...");
-			await delay(2000);
-			const res = await mintAndTransfer(
-				suiClient,
+			const result = await mintAndTransfer(
 				coinType,
 				treasuryCap,
 				recipient,
-				signer
+				signAndExecuteTransaction
 			);
-			console.log(res);
+			console.log(result);
 		} catch (error) {
 			console.error(error);
 		}
@@ -105,13 +121,15 @@ export default function Home() {
 		<div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-50">
 			{/* Header */}
 			<header className="flex items-center justify-between w-full p-4 bg-white shadow-md">
-				<h1 className="text-lg font-bold text-gray-700">My App</h1>
-				<button
-					className="text-gray-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full"
-					aria-label="Login"
-				>
-					<FaUserCircle size={24} />
-				</button>
+				<h1 className="text-lg font-bold text-gray-700">AI SUI MEME</h1>
+				<ConnectButton
+					style={{
+						paddingTop: "12px",
+						paddingRight: "24px",
+						paddingLeft: "24px",
+						paddingBottom: "12px", 
+					}}
+				/>
 			</header>
 
 			{/* Main Content */}

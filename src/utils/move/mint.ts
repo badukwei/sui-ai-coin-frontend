@@ -1,13 +1,13 @@
-import type { AddressMetrics, SuiClient } from "@mysten/sui/client";
-import { Signer } from "@mysten/sui/cryptography";
+// import type { AddressMetrics, SuiClient } from "@mysten/sui/client";
+// import { Signer } from "@mysten/sui/cryptography";
 import { Transaction } from "@mysten/sui/transactions";
 
 export async function mintAndTransfer(
-	suiClient: SuiClient,
+	// suiClient: SuiClient,
 	coinType: string,
 	treasuryCap: string,
-    recipient: string,
-	signer: Signer
+	recipient: string,
+	signAndExecuteTransaction: any
 ) {
 	const tx = new Transaction();
 
@@ -17,7 +17,7 @@ export async function mintAndTransfer(
 		// "0x0b55b80dbec5746a5bd08b810380fbea517488b8890160dc0d1c34a7ad3ddaf9::dankmeme::DANKMEME"
 		typeArguments: [coinType],
 		arguments: [
-            // "0xce3d129b9a6e7e077aea8fa5a289e99c5acb141c994da65eab3d24d4b1bb4325"
+			// "0xce3d129b9a6e7e077aea8fa5a289e99c5acb141c994da65eab3d24d4b1bb4325"
 			tx.object(treasuryCap),
 			tx.pure.u64(1000000000),
 			tx.pure.address(recipient),
@@ -26,10 +26,8 @@ export async function mintAndTransfer(
 
 	tx.setGasBudget(200000000);
 
-	const response = await suiClient.signAndExecuteTransaction({
+	const response = await signAndExecuteTransaction({
 		transaction: tx,
-		signer: signer,
-		options: { showEffects: true, showEvents: true },
 	});
 
 	console.log("Mint and transfer successful:", response);

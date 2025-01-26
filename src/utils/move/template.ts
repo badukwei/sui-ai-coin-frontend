@@ -6,17 +6,15 @@ import {
 } from "@mysten/move-bytecode-template";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex, toBase64 } from "@mysten/sui/utils";
-import type { SuiClient } from "@mysten/sui/client";
 import { Metadata } from "@/types/ai/metadata";
-import { Signer } from "@mysten/sui/cryptography";
 
 const updateTemplate = async (
-	suiClient: SuiClient,
-	signer: Signer,
+	address: string,
 	params: Metadata,
 	imageUrl: string,
+	signAndExecuteTransaction: any,
 ) => {
-	const address = signer.toSuiAddress();
+	console.log(address)
 	const templateBytecode = fromHex(templateHex);
 
 	const { symbol, name, description } = params;
@@ -73,18 +71,24 @@ const updateTemplate = async (
 	tx.transferObjects([upgrade_cap], address);
 	tx.setGasBudget(200000000);
 
-	const response = await suiClient.signAndExecuteTransaction({
-		transaction: tx,
-		signer: signer,
-		options: {
-			showBalanceChanges: true,
-			showEffects: true,
-			showEvents: true,
-			showInput: true,
-			showObjectChanges: true,
-			showRawEffects: true,
-			showRawInput: true,
-		},
+	console.log(tx)
+
+	// const response = await suiClient.signAndExecuteTransaction({
+	// 	transaction: tx,
+	// 	signer: signer,
+	// 	options: {
+	// 		showBalanceChanges: true,
+	// 		showEffects: true,
+	// 		showEvents: true,
+	// 		showInput: true,
+	// 		showObjectChanges: true,
+	// 		showRawEffects: true,
+	// 		showRawInput: true,
+	// 	},
+	// });
+
+	const response = await signAndExecuteTransaction({
+		transaction: tx,		
 	});
 
 	console.log("Template created successfully!");
