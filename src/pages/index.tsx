@@ -116,19 +116,33 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-darkblue to-black">
+		<div className="flex flex-col min-h-screen">
 			{/* Header */}
-			<header className="flex items-center justify-between w-full p-4 bg-transparent">
+			<header
+				className="flex items-center justify-between w-full p-4"
+				style={{
+					background:
+						"linear-gradient(90deg, rgba(10,25,47,0.95) 0%, rgba(20,40,60,0.95) 100%)",
+					borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+					boxShadow: "0 2px 5px rgba(0, 0, 0, 0.3)",
+				}}
+			>
 				<h1 className="text-lg font-bold text-white">AI SUI MEME</h1>
 				<CustomConnectButton address={address} />
 				<CustomDisconnectButton address={address} />
 			</header>
 
 			{/* Main Content */}
-			<main className="flex items-center flex-1 flex-col px-4 gap-20">
-				<section className="relative bg-gradient-to-b from-black via-darkblue to-black flex flex-col items-center justify-center text-center px-4">
+			<main
+				className="flex items-center flex-1 flex-col px-4 gap-20 py-20"
+				style={{
+					background:
+						"radial-gradient(circle, rgba(58,110,165,0.5) 0%, rgba(10,25,47,1) 70%, rgba(5,15,30,1) 100%)",
+				}}
+			>
+				<section className="relative flex flex-col items-center justify-center text-center px-4">
 					{/* Hero Content */}
-					<div className="mt-20">
+					<div>
 						<h2 className="text-4xl lg:text-6xl font-extrabold text-white leading-tight">
 							Transform Your Ideas into Memecoins
 						</h2>
