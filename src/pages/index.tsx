@@ -23,6 +23,7 @@ import {
 import fetchImage from "@/utils/ai/falAI";
 import CustomConnectButton from "@/components/common/CustomConnectButton";
 import CustomDisconnectButton from "@/components/common/CustomDisconnectButton";
+import { mintWithEvent } from "@/utils/move/mintWithEvent";
 
 interface FormValues {
 	userInput: string;
@@ -103,9 +104,13 @@ export default function Home() {
 				formatCreateTemplateResponse(netWorkResponse);
 			if (!coinType || !treasuryCap || !recipient)
 				throw new Error(`API error: Fail create the coin`);
-			const result = await mintAndTransfer(
+			const result = await mintWithEvent(
 				coinType,
 				treasuryCap,
+				metadata.name,
+				metadata.symbol,
+				metadata.description,
+				ImageUrl,
 				recipient,
 				signAndExecuteTransaction
 			);
