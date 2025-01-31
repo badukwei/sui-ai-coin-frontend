@@ -7,28 +7,21 @@ import { Metadata, MetadataApiResponse } from "@/types/ai/metadata";
  * @returns {Promise<Metadata>} - The response containing the metadata.
  */
 const fetchMetadata = async (content: string): Promise<Metadata> => {
-	try {
-		const response = await fetch(`${BACKEND}/openai/createMetadata`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ content }),
-		});
+	const response = await fetch(`${BACKEND}/openai/createMetadata`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ content }),
+	});
 
-		if (!response.ok) {
-			throw new Error(
-				`API error: ${response.status} ${response.statusText}`
-			);
-		}
-
-		const data: MetadataApiResponse = await response.json();
-		const metadata = data.message;
-		return metadata;
-	} catch (error) {
-		console.error("Error fetching metadata:", error);
-		throw error;
+	if (!response.ok) {
+		throw new Error(`API error: ${response.status} ${response.statusText}`);
 	}
+
+	const data: MetadataApiResponse = await response.json();
+	const metadata = data.message;
+	return metadata;
 };
 
 export default fetchMetadata;

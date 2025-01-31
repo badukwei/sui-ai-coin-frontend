@@ -1,124 +1,15 @@
-// import { Geist, Geist_Mono } from "next/font/google";
-import { useEffect, useState } from "react";
-import { FaArrowRight, FaUserCircle } from "react-icons/fa";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { fromHex, toHex, toBase64 } from "@mysten/sui/utils";
-import {
-	useCurrentWallet,
-	ConnectButton,
-	useSuiClient,
-	useDisconnectWallet,
-	useSignAndExecuteTransaction,
-} from "@mysten/dapp-kit";
+import { useCurrentWallet } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
-import init from "@mysten/move-bytecode-template";
-import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
-import updateTemplate from "@/utils/move/template";
-import { mintAndTransfer } from "@/utils/move/mint";
-import fetchMetadata from "@/utils/ai/openAI";
-import {
-	formatCreateImagePrompt,
-	formatCreateTemplateResponse,
-} from "@/utils/move/format";
-import fetchImage from "@/utils/ai/falAI";
 import CustomConnectButton from "@/components/common/CustomConnectButton";
 import CustomDisconnectButton from "@/components/common/CustomDisconnectButton";
-import { mintWithEvent } from "@/utils/move/mintWithEvent";
-
-interface FormValues {
-	userInput: string;
-}
+import CreateCoinForm from "@/components/home/CreateCoinForm";
+import BasicModal from "@/components/modal/ErrorModal";
+import ErrorModal from "@/components/modal/ErrorModal";
 
 export default function Home() {
-	// states
-	// form control
-	const {
-		handleSubmit,
-		control,
-		reset,
-		formState: { errors },
-		trigger,
-		setValue,
-		watch,
-		getValues,
-	} = useForm<FormValues>({
-		defaultValues: {
-			userInput: "",
-		},
-	});
-
 	// sui
-	const suiClient = useSuiClient();
 	const { currentWallet } = useCurrentWallet();
 	const address = currentWallet?.accounts?.[0]?.address;
-	const { mutateAsync: signAndExecuteTransaction } =
-		useSignAndExecuteTransaction({
-			execute: async ({ bytes, signature }) =>
-				await suiClient.executeTransactionBlock({
-					transactionBlock: bytes,
-					signature,
-					options: {
-						showBalanceChanges: true,
-						showEffects: true,
-						showEvents: true,
-						showInput: true,
-						showObjectChanges: true,
-						showRawEffects: true,
-						showRawInput: true,
-					},
-				}),
-		});
-
-	useEffect(() => {
-		const initWasm = async () => {
-			try {
-				await init("/move_bytecode_template_bg.wasm");
-				console.log("WASM initialized successfully!");
-			} catch (error) {
-				console.error("Error initializing WASM:", error);
-			}
-		};
-
-		initWasm();
-	}, []);
-
-	const createCoin = async (data: FormValues) => {
-		const { userInput } = data;
-		if (!userInput || !address) return;
-		try {
-			const metadata = await fetchMetadata(userInput);
-			console.log(metadata);
-
-			const prompt = formatCreateImagePrompt(metadata);
-			const ImageUrl = await fetchImage(prompt);
-			console.log(ImageUrl);
-
-			const netWorkResponse = await updateTemplate(
-				address,
-				metadata,
-				ImageUrl,
-				signAndExecuteTransaction
-			);
-			console.log(netWorkResponse);
-			const { coinType, treasuryCap, recipient } =
-				formatCreateTemplateResponse(netWorkResponse);
-			if (!coinType || !treasuryCap || !recipient)
-				throw new Error(`API error: Fail create the coin`);
-			const result = await mintWithEvent(
-				coinType,
-				treasuryCap,
-				metadata.name,
-				metadata.symbol,
-				metadata.description,
-				ImageUrl,
-				recipient,
-				signAndExecuteTransaction
-			);
-			console.log(result);
-		} catch (error) {
-			console.error(error);
-		}
-	};
 
 	return (
 		<div className="flex flex-col min-h-screen">
@@ -145,7 +36,7 @@ export default function Home() {
 						"radial-gradient(circle, rgba(58,110,165,0.5) 0%, rgba(10,25,47,1) 70%, rgba(5,15,30,1) 100%)",
 				}}
 			>
-				<section className="relative flex flex-col items-center justify-center text-center px-4">
+				<section className="relative flex flex-col items-center justify-center text-center">
 					{/* Hero Content */}
 					<div>
 						<h2 className="text-4xl lg:text-6xl font-extrabold text-white leading-tight">
@@ -176,32 +67,7 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-				<section className="relative w-full max-w-3xl h-32 p-4 border border-gray-600 rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-lg">
-					{/* Textarea */}
-					<form onSubmit={handleSubmit(createCoin)}>
-						<Controller
-							name="userInput"
-							control={control}
-							render={({ field }) => (
-								<textarea
-									placeholder="Type your message here..."
-									className="w-full h-full p-4 pr-12 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
-									value={field.value}
-									onChange={field.onChange}
-								></textarea>
-							)}
-						/>
-
-						{/* Send Button */}
-						<button
-							type="submit"
-							className="absolute bottom-4 right-4 flex items-center justify-center w-10 h-10 text-white bg-gradient-to-br from-blue-500 to-blue-700 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-							aria-label="Send"
-						>
-							<FaArrowRight size={16} />
-						</button>
-					</form>
-				</section>
+				<CreateCoinForm address={address} />
 			</main>
 		</div>
 	);
