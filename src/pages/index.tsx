@@ -3,10 +3,18 @@ import "@mysten/dapp-kit/dist/index.css";
 import CustomConnectButton from "@/components/common/CustomConnectButton";
 import CustomDisconnectButton from "@/components/common/CustomDisconnectButton";
 import CreateCoinForm from "@/components/home/CreateCoinForm";
-import BasicModal from "@/components/modal/ErrorModal";
-import ErrorModal from "@/components/modal/ErrorModal";
+import { useRef, useState } from "react";
+import IntroductionModal from "@/components/modal/IntroductionModal";
 
 export default function Home() {
+	// states
+	const [isIntroOpen, setIsIntroOpen] = useState<boolean>(false);
+		
+	// ref
+	const createCoinFormRef = useRef<{ focusTextarea: () => void } | null>(
+		null
+	);
+
 	// sui
 	const { currentWallet } = useCurrentWallet();
 	const address = currentWallet?.accounts?.[0]?.address;
@@ -48,10 +56,18 @@ export default function Home() {
 						</p>
 
 						<div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
-							<button className="px-6 py-3 text-lg font-medium bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+							<button
+								onClick={() =>
+									createCoinFormRef.current?.focusTextarea()
+								}
+								className="px-6 py-3 text-lg font-medium bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+							>
 								Start Creating →
 							</button>
-							<button className="px-6 py-3 text-lg font-medium bg-transparent text-white border border-gray-500 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all">
+							<button
+								onClick={() => setIsIntroOpen(true)}
+								className="px-6 py-3 text-lg font-medium bg-transparent text-white border border-gray-500 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
+							>
 								Learn How It Works
 							</button>
 						</div>
@@ -67,8 +83,12 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-				<CreateCoinForm address={address} />
+				<CreateCoinForm address={address} ref={createCoinFormRef} />
 			</main>
+			<IntroductionModal
+				isOpen={isIntroOpen}
+				handleClose={() => setIsIntroOpen(false)}
+			/>
 		</div>
 	);
 }

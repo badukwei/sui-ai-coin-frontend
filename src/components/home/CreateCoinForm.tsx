@@ -6,7 +6,7 @@ import { mintWithEvent } from "@/utils/move/mintWithEvent";
 import updateTemplate from "@/utils/move/template";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import init from "@mysten/move-bytecode-template";
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaArrowRight } from "react-icons/fa";
 import ErrorModal from "../modal/ErrorModal";
@@ -29,11 +29,16 @@ const defaultMetadata = {
 	imageUrl: "",
 };
 
-const CreateCoinForm: React.FC<Props> = ({ address }) => {
+const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
+	// states
 	const [error, setError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [metadata, setMetadata] = useState<IMetadata>(defaultMetadata);
+	const [metadata, setMetadata] = useState<IMetadata>(defaultMetadata);
 
+	// refs
+	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+	// form
 	const {
 		handleSubmit,
 		control,
@@ -86,7 +91,7 @@ const CreateCoinForm: React.FC<Props> = ({ address }) => {
 				imageUrl,
 				signAndExecuteTransaction
 			);
-            console.log(netWorkResponse);
+			console.log(netWorkResponse);
 			const { coinType, treasuryCap, recipient } =
 				formatCreateTemplateResponse(netWorkResponse);
 			if (!coinType || !treasuryCap || !recipient) throw new Error();
@@ -101,19 +106,25 @@ const CreateCoinForm: React.FC<Props> = ({ address }) => {
 				signAndExecuteTransaction
 			);
 			console.log(result);
-            setIsLoading(false);
-            setMetadata({
+			setIsLoading(false);
+			setMetadata({
 				...metadata,
 				imageUrl,
 			});
 		} catch (error) {
 			console.error(error);
-            setIsLoading(false);
+			setIsLoading(false);
 			setError(
 				"Something went wrong while creating your memecoin. This could be due to a network issue, blockchain congestion, or an unexpected error. Please check your connection and try again later."
 			);
 		}
 	};
+
+	useImperativeHandle(ref, () => ({
+		focusTextarea: () => {
+			textareaRef.current?.focus();
+		},
+	}));
 
 	useEffect(() => {
 		const initWasm = async () => {
@@ -141,7 +152,8 @@ const CreateCoinForm: React.FC<Props> = ({ address }) => {
 						control={control}
 						render={({ field }) => (
 							<textarea
-								placeholder="Type your message here..."
+								ref={textareaRef}
+								placeholder="Type your prompt here..."
 								className="w-full h-full p-4 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
 								value={field.value}
 								onChange={field.onChange}
@@ -169,7 +181,7 @@ const CreateCoinForm: React.FC<Props> = ({ address }) => {
 				isOpen={!!metadata.symbol}
 				memecoin={metadata}
 				handleClose={() => setMetadata(defaultMetadata)}
-			/>  
+			/>
 			<ErrorModal
 				isOpen={!!error}
 				title="Memecoin Creation Failed"
@@ -178,6 +190,6 @@ const CreateCoinForm: React.FC<Props> = ({ address }) => {
 			/>
 		</>
 	);
-};
+});
 
 export default CreateCoinForm;
