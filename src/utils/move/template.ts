@@ -7,14 +7,17 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex, toBase64 } from "@mysten/sui/utils";
 import { Metadata } from "@/types/ai/metadata";
+import { SuiTransactionBlockResponse } from "@mysten/sui/client";
 
 const updateTemplate = async (
 	address: string,
 	params: Metadata,
 	imageUrl: string,
-	signAndExecuteTransaction: any,
+	signAndExecuteTransaction: (args: {
+		transaction: Transaction;
+	}) => Promise<SuiTransactionBlockResponse>
 ) => {
-	console.log(address)
+	console.log(address);
 	const templateBytecode = fromHex(templateHex);
 
 	const { symbol, name, description } = params;
@@ -71,7 +74,7 @@ const updateTemplate = async (
 	tx.transferObjects([upgrade_cap], address);
 	tx.setGasBudget(200000000);
 
-	console.log(tx)
+	console.log(tx);
 
 	// const response = await suiClient.signAndExecuteTransaction({
 	// 	transaction: tx,
@@ -88,7 +91,7 @@ const updateTemplate = async (
 	// });
 
 	const response = await signAndExecuteTransaction({
-		transaction: tx,		
+		transaction: tx,
 	});
 
 	console.log("Template created successfully!");

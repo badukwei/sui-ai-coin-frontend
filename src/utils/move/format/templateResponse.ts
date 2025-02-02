@@ -1,4 +1,4 @@
-import { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { SuiObjectChange, SuiTransactionBlockResponse } from "@mysten/sui/client";
 
 const formatCreateTemplateResponse = (
 	netWorkResponse: SuiTransactionBlockResponse
@@ -17,12 +17,14 @@ const formatCreateTemplateResponse = (
 		  }::${coinTypeObject.modules[0].toUpperCase()}`
 		: null;
 
-	const treasuryCapObject = netWorkResponse.objectChanges.find((obj: any) => {
-		return (
-			obj.type === "created" &&
-			obj.objectType.startsWith("0x2::coin::TreasuryCap")
-		);
-	}) as { objectId: string } | undefined;
+	const treasuryCapObject = netWorkResponse.objectChanges.find(
+		(obj: SuiObjectChange) => {
+			return (
+				obj.type === "created" &&
+				obj.objectType.startsWith("0x2::coin::TreasuryCap")
+			);
+		}
+	) as { objectId: string } | undefined;
 
 	const treasuryCap = treasuryCapObject?.objectId || null;
 

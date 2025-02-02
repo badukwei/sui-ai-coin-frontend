@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FaExclamationTriangle, FaTimesCircle } from "react-icons/fa";
+import { FaExclamationTriangle } from "react-icons/fa";
 import Modal from "@mui/material/Modal";
 
 interface Props {

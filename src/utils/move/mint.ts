@@ -1,10 +1,13 @@
+import { SignedTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 
 export async function mintAndTransfer(
 	coinType: string,
 	treasuryCap: string,
 	recipient: string,
-	signAndExecuteTransaction: any
+	signAndExecuteTransaction: (args: {
+		transaction: Transaction;
+	}) => Promise<SignedTransaction>
 ) {
 	const tx = new Transaction();
 

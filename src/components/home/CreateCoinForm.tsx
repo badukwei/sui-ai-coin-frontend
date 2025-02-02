@@ -42,12 +42,6 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
 	const {
 		handleSubmit,
 		control,
-		reset,
-		formState: { errors },
-		trigger,
-		setValue,
-		watch,
-		getValues,
 	} = useForm<FormValues>({
 		defaultValues: {
 			userInput: "",
@@ -191,5 +185,7 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
 		</>
 	);
 });
+
+CreateCoinForm.displayName = "CreateCoinForm";
 
 export default CreateCoinForm;

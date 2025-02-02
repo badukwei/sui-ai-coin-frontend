@@ -1,6 +1,5 @@
 import * as React from "react";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { MdClose } from "react-icons/md";
+import { FaCheckCircle } from "react-icons/fa";
 import { FiEdit3, FiSend, FiClock } from "react-icons/fi";
 import Modal from "@mui/material/Modal";
 

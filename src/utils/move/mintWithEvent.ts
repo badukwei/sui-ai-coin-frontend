@@ -1,15 +1,18 @@
 import { packageAddress } from "@/constants/move/claim";
+import { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 export async function mintWithEvent(
 	coinType: string,
 	treasuryCap: string,
-    name: string,
-    symbol: string,
-    description: string,
-    url: string,
+	name: string,
+	symbol: string,
+	description: string,
+	url: string,
 	recipient: string,
-	signAndExecuteTransaction: any
+	signAndExecuteTransaction: (args: {
+		transaction: Transaction;
+	}) => Promise<SuiTransactionBlockResponse>
 ) {
 	const tx = new Transaction();
 

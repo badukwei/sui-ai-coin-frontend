@@ -48,8 +48,8 @@ const LoadingModal: React.FC<Props> = ({ isOpen, handleClose }) => {
 					{/* ⚠️ 超過 30 秒時顯示 */}
 					{isTakingTooLong && (
 						<p className="mt-6 text-yellow-400 font-medium">
-							⚠️ It's taking longer than expected. Please refresh
-							and try again.
+							{`⚠️ It's taking longer than expected. Please refresh
+							and try again.`}
 						</p>
 					)}
 
