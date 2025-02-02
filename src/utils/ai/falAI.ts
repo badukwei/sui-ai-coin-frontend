@@ -1,10 +1,12 @@
+import { BACKEND_PRODUCTION } from "@/constants";
+
 /**
  * Fetches an image URL from the specified API
  * @param {string} prompt - The prompt to send to the API for generating an image.
  * @returns {Promise<string>} - The URL of the generated image.
  */
 const fetchImage = async (prompt: string): Promise<string> => {
-	const response = await fetch("http://localhost:5050/falai/createImage", {
+	const response = await fetch(`${BACKEND_PRODUCTION}/falai/createImage`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",

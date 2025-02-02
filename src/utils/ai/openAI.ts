@@ -1,4 +1,4 @@
-import { BACKEND } from "@/constants";
+import { BACKEND_PRODUCTION } from "@/constants";
 import { Metadata, MetadataApiResponse } from "@/types/ai/metadata";
 
 /**
@@ -7,7 +7,7 @@ import { Metadata, MetadataApiResponse } from "@/types/ai/metadata";
  * @returns {Promise<Metadata>} - The response containing the metadata.
  */
 const fetchMetadata = async (content: string): Promise<Metadata> => {
-	const response = await fetch(`${BACKEND}/openai/createMetadata`, {
+	const response = await fetch(`${BACKEND_PRODUCTION}/openai/createMetadata`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
