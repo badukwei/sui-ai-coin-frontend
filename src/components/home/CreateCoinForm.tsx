@@ -159,7 +159,7 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
 				<div className="absolute bottom-4 right-4">
 					<button
 						type="submit"
-						className="flex items-center justify-center w-8 h-8 text-white bg-gradient-to-br from-blue-500 to-blue-700 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+						className="flex cursor-pointer items-center justify-center w-8 h-8 text-white bg-gradient-to-br from-blue-500 to-blue-700 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 						aria-label="Send"
 						disabled={!address || !!error}
 					>
