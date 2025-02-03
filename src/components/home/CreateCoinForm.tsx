@@ -6,7 +6,13 @@ import { mintWithEvent } from "@/utils/move/mintWithEvent";
 import updateTemplate from "@/utils/move/template";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import init from "@mysten/move-bytecode-template";
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaArrowRight } from "react-icons/fa";
 import ErrorModal from "../modal/ErrorModal";
@@ -29,7 +35,7 @@ const defaultMetadata = {
 	imageUrl: "",
 };
 
-const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
+const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 	// states
 	const [error, setError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -39,10 +45,7 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
 	// form
-	const {
-		handleSubmit,
-		control,
-	} = useForm<FormValues>({
+	const { handleSubmit, control } = useForm<FormValues>({
 		defaultValues: {
 			userInput: "",
 		},
@@ -136,7 +139,9 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) =>  {
 	return (
 		<>
 			<form
-				className="relative w-full max-w-3xl h-32 p-4 border border-gray-600 rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-lg"
+				className="relative w-full max-w-3xl h-32 p-4 border border-gray-600 rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-lg 
+        			transition-all duration-300 ease-in-out
+        			focus-within:ring-4 focus-within:ring-blue-500 focus-within:border-blue-500 focus-within:shadow-blue-500/50"
 				onSubmit={handleSubmit(createCoin)}
 			>
 				{/* Textarea */}

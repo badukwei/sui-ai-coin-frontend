@@ -5,6 +5,7 @@ import CustomDisconnectButton from "@/components/common/CustomDisconnectButton";
 import CreateCoinForm from "@/components/home/CreateCoinForm";
 import { useRef, useState } from "react";
 import IntroductionModal from "@/components/modal/IntroductionModal";
+import { TypeAnimation } from "react-type-animation";
 
 export default function Home() {
 	// states
@@ -77,8 +78,17 @@ export default function Home() {
 					<div className="mt-16">
 						<div className="w-full max-w-3xl mx-auto bg-gradient-to-b from-gray-900 via-black to-gray-800 rounded-lg shadow-2xl p-10">
 							<p className="text-white text-lg">
-								Empowering creativity with AI and blockchain.
-								Your next viral token is just a few words away.
+								<TypeAnimation
+									sequence={[
+										"Empowering creativity with AI and blockchain.",
+										2000,
+										"Your next viral token is just a few words away.",
+										2000,
+									]}
+									wrapper="span"
+									speed={50}
+									repeat={Infinity}
+								/>
 							</p>
 						</div>
 					</div>
