@@ -19,6 +19,7 @@ import ErrorModal from "../modal/ErrorModal";
 import LoadingModal from "../modal/LoadingModal";
 import SuccessModal from "../modal/SuccessModal";
 import { IMetadata } from "@/types/move/metadata";
+import formatCoinAddress from "@/utils/move/format/formatCoinAddress";
 
 interface Props {
 	address?: string;
@@ -33,6 +34,7 @@ const defaultMetadata = {
 	name: "",
 	description: "",
 	imageUrl: "",
+	coinAddress: "",
 };
 
 const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
@@ -103,10 +105,13 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 				signAndExecuteTransaction
 			);
 			console.log(result);
+			const coinAddress = formatCoinAddress(result, metadata.symbol);
+
 			setIsLoading(false);
 			setMetadata({
 				...metadata,
 				imageUrl,
+				coinAddress,
 			});
 		} catch (error) {
 			console.error(error);

@@ -2,6 +2,9 @@ import * as React from "react";
 import Modal from "@mui/material/Modal";
 import { FaCheckCircle } from "react-icons/fa";
 import { IMetadata } from "@/types/move/metadata";
+import Link from "next/link";
+import truncateAddress from "@/utils/move/format/truncateAddress";
+import { FiExternalLink } from "react-icons/fi";
 
 interface Props {
 	isOpen: boolean;
@@ -38,22 +41,51 @@ const SuccessModal: React.FC<Props> = ({ isOpen, memecoin, handleClose }) => {
 					</div>
 
 					{/* 🔹 Memecoin Info */}
-					<p className="mt-4 text-[#E3F2FD] text-lg font-bold">
+					<Link
+						href={`https://testnet.suivision.xyz/coin/${memecoin.coinAddress}`}
+						className="mt-4 text-[#E3F2FD] text-lg font-bold underline hover:text-[#64B5F6] transition-all duration-300"
+					>
 						{memecoin.name} ({memecoin.symbol})
+					</Link>
+					<p className="mt-2 text-[#B0BEC5] text-md flex items-center justify-center gap-1">
+						Coin Address:{" "}
+						<Link
+							href={`https://testnet.suivision.xyz/coin/${memecoin.coinAddress}`}
+							className="text-[#90CAF9] underline hover:text-[#64B5F6] flex items-center gap-1"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{truncateAddress(memecoin.coinAddress)}
+							<FiExternalLink className="inline-block text-lg" />
+						</Link>
 					</p>
 					<p className="mt-2 text-[#B0BEC5] text-md">
 						{memecoin.description}
 					</p>
 
-					{/* 🔳 Close Button */}
-					<button
-						onClick={handleClose}
-						className="bg-[#4CAF50] text-white px-5 py-2 rounded-lg 
-                                hover:bg-green-600 hover:shadow-[0_0_10px_rgba(76,175,80,1)] 
-                                transition-all duration-300 mt-6"
-					>
-						Close
-					</button>
+					<div className="mt-6 flex justify-center gap-4">
+						{/* Provide Feedback Button as a Link */}
+						<Link
+							href="https://forms.gle/WgybJUgFN9d7XVTY8"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="w-40 bg-blue-500 text-white px-5 py-2 rounded-lg 
+                   hover:bg-blue-600 hover:shadow-[0_0_10px_rgba(33,150,243,1)] 
+                   transition-all duration-300 text-center flex items-center justify-center"
+						>
+							Feedback
+						</Link>
+
+						{/* Close Button */}
+						<button
+							onClick={handleClose}
+							className="w-40 bg-gray-500 text-white px-5 py-2 rounded-lg 
+                   hover:bg-gray-600 hover:shadow-[0_0_10px_rgba(158,158,158,1)] 
+                   transition-all duration-300"
+						>
+							Close
+						</button>
+					</div>
 				</div>
 			</div>
 		</Modal>
