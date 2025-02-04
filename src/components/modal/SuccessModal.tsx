@@ -42,7 +42,7 @@ const SuccessModal: React.FC<Props> = ({ isOpen, memecoin, handleClose }) => {
 
 					{/* 🔹 Memecoin Info */}
 					<Link
-						href={`https://testnet.suivision.xyz/coin/${memecoin.coinAddress}`}
+						href={`https://suivision.xyz/coin/${memecoin.coinAddress}`}
 						className="mt-4 text-[#E3F2FD] text-lg font-bold underline hover:text-[#64B5F6] transition-all duration-300"
 					>
 						{memecoin.name} ({memecoin.symbol})
@@ -50,7 +50,7 @@ const SuccessModal: React.FC<Props> = ({ isOpen, memecoin, handleClose }) => {
 					<p className="mt-2 text-[#B0BEC5] text-md flex items-center justify-center gap-1">
 						Coin Address:{" "}
 						<Link
-							href={`https://testnet.suivision.xyz/coin/${memecoin.coinAddress}`}
+							href={`https://suivision.xyz/coin/${memecoin.coinAddress}`}
 							className="text-[#90CAF9] underline hover:text-[#64B5F6] flex items-center gap-1"
 							target="_blank"
 							rel="noopener noreferrer"

@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 const { networkConfig } = createNetworkConfig({
-	testnet: { url: getFullnodeUrl("testnet") },
+	mainnet: { url: getFullnodeUrl("mainnet") },
 });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		<QueryClientProvider client={queryClient}>
 			<SuiClientProvider
 				networks={networkConfig}
-				defaultNetwork="testnet"
+				defaultNetwork="mainnet"
 			>
 				<WalletProvider autoConnect>
 					<Component {...pageProps} />
