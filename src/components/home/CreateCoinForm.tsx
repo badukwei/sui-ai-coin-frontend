@@ -47,7 +47,11 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
 	// form
-	const { handleSubmit, control } = useForm<FormValues>({
+	const {
+		handleSubmit,
+		control,
+		formState: { errors },
+	} = useForm<FormValues>({
 		defaultValues: {
 			userInput: "",
 		},
@@ -144,39 +148,66 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 	return (
 		<>
 			<form
-				className="relative w-full max-w-3xl h-32 p-4 border border-gray-600 rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-lg 
-        			transition-all duration-300 ease-in-out
-        			focus-within:ring-4 focus-within:ring-blue-500 focus-within:border-blue-500 focus-within:shadow-blue-500/50"
+				className={`relative w-full max-w-3xl h-40 p-4 border rounded-lg shadow-lg bg-gradient-to-br 
+                    from-gray-800 via-gray-900 to-black transition-all duration-300 ease-in-out
+                    focus-within:ring-4 focus-within:ring-blue-500 focus-within:border-blue-500 focus-within:shadow-blue-500/50
+                    ${
+						errors.userInput
+							? "border-red-500 focus-within:ring-red-500 focus-within:border-red-500 focus-within:shadow-red-500/50"
+							: "border-gray-600"
+					}`}
 				onSubmit={handleSubmit(createCoin)}
 			>
 				{/* Textarea */}
-				<div className="pr-12 h-full relative">
+				<div className="relative">
 					<Controller
 						name="userInput"
 						control={control}
+						rules={{
+							required: "Prompt cannot be empty.",
+							maxLength: {
+								value: 2000,
+								message:
+									"Prompt cannot exceed 2000 characters.",
+							},
+						}}
 						render={({ field }) => (
 							<textarea
-								ref={textareaRef}
+								{...field}
 								placeholder="Type your prompt here..."
-								className="w-full h-full p-4 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
-								value={field.value}
-								onChange={field.onChange}
-							></textarea>
+								className="w-full h-28 p-4 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
+							/>
 						)}
 					/>
 				</div>
 
+				{/* Submit Button */}
 				<div className="absolute bottom-4 right-4">
 					<button
 						type="submit"
-						className="flex cursor-pointer items-center justify-center w-8 h-8 text-white bg-gradient-to-br from-blue-500 to-blue-700 rounded-full shadow-md hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+						className={`flex cursor-pointer items-center justify-center w-8 h-8 text-white rounded-full shadow-md 
+                            focus:ring-2 focus:outline-none transition-all duration-300
+                            ${
+								errors.userInput
+									? "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+									: "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+							}`}
 						aria-label="Send"
-						disabled={!address || !!error}
+						// disabled={!address || !!error}
 					>
 						<FaArrowRight size={12} />
 					</button>
 				</div>
+				{/* Error Message */}
+				<div className="absolute bottom-4 left-4">
+					{errors.userInput && (
+						<p className="text-red-400 text-sm mt-1 animate-fade-in">
+							{errors.userInput.message}
+						</p>
+					)}
+				</div>
 			</form>
+
 			<LoadingModal
 				isOpen={isLoading}
 				handleClose={() => setIsLoading(false)}
