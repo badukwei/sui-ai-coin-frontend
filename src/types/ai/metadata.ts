@@ -1,10 +1,10 @@
 export interface Metadata {
-	symbol: string;
-	name: string;
-	description: string;
+  symbol: string;
+  name: string;
+  description: string;
 }
 
 export interface MetadataApiResponse {
-	success: boolean;
-	message: Metadata;
+  success: boolean;
+  message: Metadata;
 }
