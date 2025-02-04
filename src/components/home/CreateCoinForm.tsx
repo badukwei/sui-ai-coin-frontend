@@ -14,12 +14,13 @@ import React, {
 	useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowDown, FaArrowRight } from "react-icons/fa";
 import ErrorModal from "../modal/ErrorModal";
 import LoadingModal from "../modal/LoadingModal";
 import SuccessModal from "../modal/SuccessModal";
 import { IMetadata } from "@/types/move/metadata";
 import formatCoinAddress from "@/utils/move/format/formatCoinAddress";
+import CustomConnectButton from "../common/CustomConnectButton";
 
 interface Props {
 	address?: string;
@@ -146,7 +147,13 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 	}, []);
 
 	return (
-		<>
+		<section className="w-full flex  flex-col justify-center items-center">
+			{/* Improved Title with Downward Icon */}
+			<h2 className="text-gray-200 text-2xl font-bold p-2 w-full max-w-3xl text-left tracking-wide flex items-center gap-2">
+				Create Your Memecoin
+				<FaArrowDown className="text-blue-400 text-xl" />
+			</h2>
+
 			<form
 				className={`relative w-full max-w-3xl h-40 p-4 border rounded-lg shadow-lg bg-gradient-to-br 
                     from-gray-800 via-gray-900 to-black transition-all duration-300 ease-in-out
@@ -158,28 +165,30 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 					}`}
 				onSubmit={handleSubmit(createCoin)}
 			>
+				{!address && (
+					<div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-md flex flex-col items-center justify-center rounded-lg border border-gray-500/50">
+						<CustomConnectButton address={address} />
+					</div>
+				)}
 				{/* Textarea */}
-				<div className="relative">
-					<Controller
-						name="userInput"
-						control={control}
-						rules={{
-							required: "Prompt cannot be empty.",
-							maxLength: {
-								value: 2000,
-								message:
-									"Prompt cannot exceed 2000 characters.",
-							},
-						}}
-						render={({ field }) => (
-							<textarea
-								{...field}
-								placeholder="Type your prompt here..."
-								className="w-full h-28 p-4 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
-							/>
-						)}
-					/>
-				</div>
+				<Controller
+					name="userInput"
+					control={control}
+					rules={{
+						required: "Prompt cannot be empty.",
+						maxLength: {
+							value: 2000,
+							message: "Prompt cannot exceed 2000 characters.",
+						},
+					}}
+					render={({ field }) => (
+						<textarea
+							{...field}
+							placeholder="Type your prompt here..."
+							className="w-full h-28 p-4 border-none focus:outline-none resize-none font-sans text-white bg-transparent placeholder-gray-400"
+						/>
+					)}
+				/>
 
 				{/* Submit Button */}
 				<div className="absolute bottom-4 right-4">
@@ -223,7 +232,7 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 				handleClose={() => setError("")}
 				errorMessage={error}
 			/>
-		</>
+		</section>
 	);
 });
 
