@@ -2,10 +2,11 @@ import { useSuiClient } from "@mysten/dapp-kit";
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import CoinCard from "./CoinCard";
+import { MetadataWithTime } from "@/types/move/metadata";
 
 const CardList = () => {
 	const suiClient = useSuiClient();
-	const [memecoins, setMemecoins] = useState<any[]>([]);
+	const [memecoins, setMemecoins] = useState<MetadataWithTime[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -19,14 +20,15 @@ const CardList = () => {
 					},
 				});
 
+				// eslint-disable-next-line
 				const parsedMemecoins = data.map((event: any) => ({
 					name: event.parsedJson.name,
 					symbol: event.parsedJson.symbol,
 					description:
 						event.parsedJson.description ||
 						"No description available.",
-					uri: event.parsedJson.uri,
-					ca: event.parsedJson.ca,
+					imageUrl: event.parsedJson.uri,
+					coinAddress: event.parsedJson.ca,
 					timestamp: parseInt(event.timestampMs, 10),
 				}));
 

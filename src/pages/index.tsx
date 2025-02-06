@@ -4,7 +4,6 @@ import CreateCoinForm from "@/components/home/CreateCoinForm";
 import { useRef, useState } from "react";
 import IntroductionModal from "@/components/modal/IntroductionModal";
 import { TypeAnimation } from "react-type-animation";
-import Layout from "@/layout/Layout";
 import Header from "@/components/layout/Header";
 
 export default function Home() {

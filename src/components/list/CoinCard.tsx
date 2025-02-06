@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import Link from "next/link";
 import truncateAddress from "@/utils/move/format/truncateAddress";
 import { FiExternalLink } from "react-icons/fi";
@@ -9,16 +8,17 @@ interface Props {
 	name: string;
 	symbol: string;
 	description: string;
-	uri: string;
-	ca: string;
+	imageUrl: string;
+	coinAddress?: string;
+	timestamp: number;
 }
 
 const CoinCard: React.FC<Props> = ({
 	name,
 	symbol,
 	description,
-	uri,
-	ca,
+	imageUrl,
+	coinAddress,
 }) => {
 	return (
 		<div
@@ -29,7 +29,7 @@ const CoinCard: React.FC<Props> = ({
 			{/* Image with Next.js */}
 			<div className="relative w-32 h-32 mb-4">
 				<Image
-					src={uri}
+					src={imageUrl}
 					alt={name}
 					layout="fill"
 					objectFit="cover"
@@ -39,7 +39,7 @@ const CoinCard: React.FC<Props> = ({
 
 			{/* Name & Symbol */}
 			<Link
-				href={`https://suivision.xyz/coin/${ca}`}
+				href={`https://suivision.xyz/coin/${coinAddress}`}
 				className="mt-4 text-[#E3F2FD] text-lg font-bold underline hover:text-[#64B5F6] transition-all duration-300"
 			>
 				{name} ({symbol})
@@ -49,12 +49,12 @@ const CoinCard: React.FC<Props> = ({
 			<p className="mt-2 text-[#B0BEC5] text-md flex items-center justify-center gap-1">
 				Coin Address:{" "}
 				<Link
-					href={`https://suivision.xyz/coin/${ca}`}
+					href={`https://suivision.xyz/coin/${coinAddress}`}
 					className="text-[#90CAF9] underline hover:text-[#64B5F6] flex items-center gap-1"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					{truncateAddress(ca)}
+					{truncateAddress(coinAddress)}
 					<FiExternalLink className="inline-block text-lg" />
 				</Link>
 			</p>

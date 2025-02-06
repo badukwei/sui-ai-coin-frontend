@@ -19,7 +19,6 @@ import ErrorModal from "../modal/ErrorModal";
 import LoadingModal from "../modal/LoadingModal";
 import SuccessModal from "../modal/SuccessModal";
 import { IMetadata } from "@/types/move/metadata";
-import formatCoinAddress from "@/utils/move/format/formatCoinAddress";
 import CustomConnectButton from "../common/CustomConnectButton";
 
 interface Props {
