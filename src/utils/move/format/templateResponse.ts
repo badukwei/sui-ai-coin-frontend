@@ -20,6 +20,9 @@ const formatCreateTemplateResponse = (
       }::${coinTypeObject.modules[0].toUpperCase()}`
     : null;
 
+  const moduleName = coinTypeObject?.modules[0].toUpperCase() || "";
+  const coinAddress = `${coinTypeObject?.packageId}::${coinTypeObject?.modules[0]}::${moduleName}`;
+
   const treasuryCapObject = netWorkResponse.objectChanges.find(
     (obj: SuiObjectChange) => {
       return (
@@ -33,7 +36,7 @@ const formatCreateTemplateResponse = (
 
   const recipient = netWorkResponse.transaction?.data?.sender || null;
 
-  return { coinType, treasuryCap, recipient };
+  return { coinType, coinAddress, treasuryCap, recipient };
 };
 
 export default formatCreateTemplateResponse;

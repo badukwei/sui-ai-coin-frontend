@@ -96,12 +96,15 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
         signAndExecuteTransaction,
       );
       console.log(netWorkResponse);
-      const { coinType, treasuryCap, recipient } =
+
+      const { coinType, coinAddress, treasuryCap, recipient } =
         formatCreateTemplateResponse(netWorkResponse);
       if (!coinType || !treasuryCap || !recipient) throw new Error();
+
       const result = await mintWithEvent(
         coinType,
         treasuryCap,
+		coinAddress,
         metadata.name,
         metadata.symbol,
         metadata.description,
@@ -110,7 +113,6 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
         signAndExecuteTransaction,
       );
       console.log(result);
-      const coinAddress = formatCoinAddress(result, metadata.symbol);
 
       setIsLoading(false);
       setMetadata({

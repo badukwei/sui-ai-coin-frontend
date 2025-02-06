@@ -17,7 +17,6 @@ const updateTemplate = async (
     transaction: Transaction;
   }) => Promise<SuiTransactionBlockResponse>,
 ) => {
-  console.log(address);
   const templateBytecode = fromHex(templateHex);
 
   const { symbol, name, description } = params;

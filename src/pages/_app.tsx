@@ -14,17 +14,20 @@ if (process.env.NODE_ENV === "production") {
 
 const queryClient = new QueryClient();
 const { networkConfig } = createNetworkConfig({
-  mainnet: { url: getFullnodeUrl("mainnet") },
+	testnet: { url: getFullnodeUrl("testnet") },
 });
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="mainnet">
-        <WalletProvider autoConnect>
-          <Component {...pageProps} />
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+		<QueryClientProvider client={queryClient}>
+			<SuiClientProvider
+				networks={networkConfig}
+				defaultNetwork="testnet"
+			>
+				<WalletProvider autoConnect>
+					<Component {...pageProps} />
+				</WalletProvider>
+			</SuiClientProvider>
+		</QueryClientProvider>
   );
 }
