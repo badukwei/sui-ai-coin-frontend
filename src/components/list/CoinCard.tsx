@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import truncateAddress from "@/utils/move/format/truncateAddress";
 import { FiExternalLink } from "react-icons/fi";
+import { useRouter } from "next/router";
 
 interface Props {
 	name: string;
@@ -20,6 +21,7 @@ const CoinCard: React.FC<Props> = ({
 	imageUrl,
 	coinAddress,
 }) => {
+	const router = useRouter();
 	return (
 		<div
 			className="bg-[rgba(10,25,47,0.95)] border border-[rgba(58,110,165,0.8)] 
@@ -39,7 +41,7 @@ const CoinCard: React.FC<Props> = ({
 
 			{/* Name & Symbol */}
 			<Link
-				href={`https://suivision.xyz/coin/${coinAddress}`}
+				href={`/coin/${coinAddress}`}
 				className="mt-4 text-[#E3F2FD] text-lg font-bold underline hover:text-[#64B5F6] transition-all duration-300"
 			>
 				{name} ({symbol})
@@ -49,7 +51,7 @@ const CoinCard: React.FC<Props> = ({
 			<p className="mt-2 text-[#B0BEC5] text-md flex items-center justify-center gap-1">
 				Coin Address:{" "}
 				<Link
-					href={`https://suivision.xyz/coin/${coinAddress}`}
+					href={`https://testnet.suivision.xyz/coin/${coinAddress}`}
 					className="text-[#90CAF9] underline hover:text-[#64B5F6] flex items-center gap-1"
 					target="_blank"
 					rel="noopener noreferrer"
