@@ -2,6 +2,8 @@ import { useSuiClient } from "@mysten/dapp-kit";
 import { CoinMetadata } from "@mysten/sui/client";
 import React, { useEffect, useState } from "react";
 import { AIConfig } from "@/types/ai/eliza/character";
+import { ELIZA_BASE_URL } from "@/constants";
+import { apiClient } from "@/libs/apiFactory";
 
 const defaultConfig: AIConfig = {
 	name: "test",
@@ -129,39 +131,38 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 		});
 	};
 
-	const saveConfig = async () => {
-		try {
-			const response = await fetch("http://localhost:8080/agent/start", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ characterJson: config }),
-			});
+	// const saveConfig = async () => {
+	// 	try {
+	// 		const response = await fetch(`${ELIZA_BASE_URL}/agent/start`, {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify({ characterJson: config }),
+	// 		});
 
-			if (!response.ok) {
-				throw new Error(
-					`Error: ${response.status} ${response.statusText}`
-				);
-			}
+	// 		if (!response.ok) {
+	// 			throw new Error(
+	// 				`Error: ${response.status} ${response.statusText}`
+	// 			);
+	// 		}
 
-			const data = await response.json();
-			console.log("Config saved successfully:", data);
-			alert("Configuration saved successfully!");
-		} catch (error) {
-			console.error("Failed to save config:", error);
-			alert("Failed to save configuration.");
-		}
-	};
+	// 		const data = await response.json();
+	// 		console.log("Config saved successfully:", data);
+	// 		alert("Configuration saved successfully!");
+	// 	} catch (error) {
+	// 		console.error("Failed to save config:", error);
+	// 		alert("Failed to save configuration.");
+	// 	}
+	// };
 
 	const updateConfig = async () => {
 		const agentId = "a94a8fe5-ccb1-0ba6-9c4c-0873d391e987";
 
 		try {
-			// Step 1: Delete the existing agent
 			console.log(`Deleting agent: ${agentId}`);
 			const deleteResponse = await fetch(
-				`http://localhost:8080/agents/${agentId}`,
+				`${ELIZA_BASE_URL}/agents/${agentId}`,
 				{ method: "DELETE" }
 			);
 
@@ -172,8 +173,6 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 			}
 
 			console.log("Agent deleted successfully");
-
-			// Step 2: Start a new agent with the updated config
 			console.log("Starting new agent with updated config...");
 			const response = await fetch("http://localhost:8080/agent/start", {
 				method: "POST",
@@ -197,6 +196,15 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 			alert("Failed to update configuration.");
 		}
 	};
+
+    const save = () => {
+        apiClient.saveConfig(config);
+    }
+
+    const update = () => {
+        const agentId = "ebdc86d6-96fa-00e0-b114-b4603f47bb17";
+        apiClient.updateConfig(config, agentId);
+    }
 
 	useEffect(() => {
 		const fetchCoinData = async () => {
@@ -503,10 +511,16 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 
 				{/* Save Button */}
 				<button
-					onClick={updateConfig}
+					onClick={save}
 					className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
 				>
 					Save Config
+				</button>
+				<button
+					onClick={update}
+					className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
+				>
+					Update Config
 				</button>
 			</div>
 		</div>

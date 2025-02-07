@@ -1,6 +1,5 @@
-// import type { UUID, Character } from "@elizaos/core";
-
-const BASE_URL = `http://localhost:8080`;
+import { ELIZA_BASE_URL } from "@/constants";
+import { AIConfig } from "@/types/ai/eliza/character";
 
 const fetcher = async ({
 	url,
@@ -9,7 +8,7 @@ const fetcher = async ({
 	headers,
 }: {
 	url: string;
-	method?: "GET" | "POST";
+	method?: "GET" | "POST" | "DELETE";
 	body?: object | FormData;
 	headers?: HeadersInit;
 }) => {
@@ -39,7 +38,7 @@ const fetcher = async ({
 		}
 	}
 
-	return fetch(`${BASE_URL}${url}`, options).then(async (resp) => {
+	return fetch(`${ELIZA_BASE_URL}${url}`, options).then(async (resp) => {
 		const contentType = resp.headers.get("Content-Type");
 		if (contentType === "audio/mpeg") {
 			return await resp.blob();
@@ -84,8 +83,8 @@ export const apiClient = {
 		});
 	},
 	getAgents: () => fetcher({ url: "/agents" }),
-	// getAgent: (agentId: string): Promise<{ id: UUID; character: Character }> =>
-	//     fetcher({ url: `/agents/${agentId}` }),
+	getAgent: (agentId: string): Promise<{ id: string; character: AIConfig }> =>
+	    fetcher({ url: `/agents/${agentId}` }),
 	tts: (agentId: string, text: string) =>
 		fetcher({
 			url: `/${agentId}/tts`,
@@ -107,5 +106,48 @@ export const apiClient = {
 			method: "POST",
 			body: formData,
 		});
+	},
+	saveConfig: async (config: AIConfig) => {
+		try {
+			const response = await fetcher({
+				url: "/agent/start",
+				method: "POST",
+				body: { characterJson: config },
+			});
+			console.log("Config saved successfully:", response);
+			alert("Configuration saved successfully!");
+		} catch (error) {
+			console.error("Failed to save config:", error);
+			alert("Failed to save configuration.");
+		}
+	},
+
+	updateConfig: async (config: AIConfig, agentId: string) => {
+		try {
+			console.log(`Deleting agent: ${agentId}`);
+			const deleteResponse = await fetch(
+				`${ELIZA_BASE_URL}/agents/${agentId}`,
+				{ method: "DELETE" }
+			);
+
+			if (!deleteResponse.ok) {
+				throw new Error(
+					`Failed to delete agent: ${deleteResponse.status} ${deleteResponse.statusText}`
+				);
+			}
+			console.log("Agent deleted successfully");
+
+			console.log("Starting new agent with updated config...");
+			const response = await fetcher({
+				url: "/agent/start",
+				method: "POST",
+				body: { characterJson: config },
+			});
+			console.log("Agent restarted successfully:", response);
+			alert("Configuration updated and agent restarted successfully!");
+		} catch (error) {
+			console.error("Failed to update config:", error);
+			alert("Failed to update configuration.");
+		}
 	},
 };
