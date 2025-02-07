@@ -9,9 +9,9 @@ interface Props {
 }
 
 const ChatBox: React.FC<Props> = ({ coinAddress }) => {
-	const [input, setInput] = useState("");
+	const [input, setInput] = useState<string>("");
 
-	const agentId = "e0e10e6f-ff2b-0d4c-8011-1fc1eee7cb32";
+	const agentId = "a94a8fe5-ccb1-0ba6-9c4c-0873d391e987";
 
 	const queryClient = useQueryClient();
 
@@ -42,7 +42,8 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 		},
 	});
 
-	const handleSendMessage = () => {
+	const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		if (!input.trim()) return;
 
 		const newMessages = [
@@ -81,7 +82,10 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 		role !== "user" ? "received" : "sent";
 
 	return (
-		<div className="w-full max-w-3xl p-6 rounded-lg bg-black/50 shadow-lg flex flex-col gap-4">
+		<form
+			onSubmit={handleSendMessage}
+			className="w-full max-w-3xl p-6 rounded-lg bg-black/50 shadow-lg flex flex-col gap-6"
+		>
 			<div className="flex flex-col gap-6 overflow-y-auto max-h-96">
 				{messages.map((message, index) => {
 					const variant = getMessageVariant(message?.user);
@@ -133,13 +137,14 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 					placeholder="Type a message..."
 				/>
 				<button
-					onClick={handleSendMessage}
+					type="submit"
+					disabled={!input || sendMessageMutation?.isPending}
 					className="px-4 py-2 bg-blue-500 text-white rounded-lg"
 				>
 					Send
 				</button>
 			</div>
-		</div>
+		</form>
 	);
 };
 
