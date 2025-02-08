@@ -7,6 +7,7 @@ import { BotInfo } from "@/types/move/bot";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { configAddress } from "@/constants/move/store";
 import { ContentWithUser } from "@/types/eliza/message";
+import Link from "next/link";
 
 interface Props {
 	coinAddress?: string;
@@ -117,69 +118,130 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 	}, [coinAddress, suiClient]);
 
 	return (
-		<form
-			onSubmit={handleSendMessage}
-			className="w-full max-w-3xl p-6 rounded-lg bg-black/50 shadow-lg flex flex-col gap-6"
-		>
-			<div className="flex flex-col gap-6 overflow-y-auto max-h-96">
-				{messages.map((message, index) => {
-					const variant = getMessageVariant(message?.user);
+		<div className="relative w-full max-w-3xl">
+			{!agentId && (
+				<div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 rounded-lg z-10">
+					<Link
+						href={`/create/${coinAddress}`}
+						style={{
+							padding: "12px 24px",
+							backgroundColor: "rgba(255, 255, 255, 0.1)",
+							border: "1px solid rgba(255, 255, 255, 0.3)",
+							color: "white",
+							borderRadius: "8px",
+							boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+							cursor: "pointer",
+							transition:
+								"all 0.3s ease, transform 0.1s ease-in-out",
+						}}
+						onMouseEnter={(e) => {
+							(
+								e.currentTarget as HTMLElement
+							).style.backgroundColor =
+								"rgba(255, 255, 255, 0.2)";
+							(e.currentTarget as HTMLElement).style.transform =
+								"scale(1.05)";
+						}}
+						onMouseLeave={(e) => {
+							(
+								e.currentTarget as HTMLElement
+							).style.backgroundColor =
+								"rgba(255, 255, 255, 0.1)";
+							(e.currentTarget as HTMLElement).style.transform =
+								"scale(1)";
+						}}
+						onMouseDown={(e) => {
+							(e.currentTarget as HTMLElement).style.transform =
+								"scale(0.95)";
+						}}
+						onMouseUp={(e) => {
+							(e.currentTarget as HTMLElement).style.transform =
+								"scale(1.05)";
+						}}
+					>
+						Create Bot
+					</Link>
+				</div>
+			)}
 
-					return (
-						<div
-							key={index}
-							className={`flex ${
-								variant === "sent"
-									? "justify-end"
-									: "justify-start"
-							}`}
-						>
+			<form
+				onSubmit={handleSendMessage}
+				className={`relative p-6 rounded-lg bg-black/50 shadow-lg flex flex-col gap-6 ${
+					!agentId ? "opacity-30 pointer-events-none" : ""
+				}`}
+			>
+				<div className="flex flex-col gap-6 overflow-y-auto max-h-96">
+					{messages.map((message, index) => {
+						const variant = getMessageVariant(message?.user);
+
+						return (
 							<div
-								className={`flex flex-col gap-2 p-4 rounded-2xl max-w-md shadow-md ${
+								key={index}
+								className={`flex ${
 									variant === "sent"
-										? "bg-blue-500 text-white"
-										: variant === "received"
-										? "bg-gray-600 text-white"
-										: "bg-green-500 text-white"
+										? "justify-end"
+										: "justify-start"
 								}`}
 							>
-								{message.isLoading &&
-								message.user === "system" ? (
-									<PacmanLoader color="#4FC3F7" size={14} />
-								) : (
-									<>
-										<p className="text-white break-words leading-6 text-base">
-											{message.text}
-										</p>
-										<span className="text-xs text-gray-300 text-right">
-											{dayjs(message.createdAt).format(
-												"h:mm A"
-											)}
-										</span>
-									</>
-								)}
+								<div
+									className={`flex flex-col gap-2 p-4 rounded-2xl max-w-md shadow-md ${
+										variant === "sent"
+											? "bg-blue-500 text-white"
+											: variant === "received"
+											? "bg-gray-600 text-white"
+											: "bg-green-500 text-white"
+									}`}
+								>
+									{message.isLoading &&
+									message.user === "system" ? (
+										<PacmanLoader
+											color="#4FC3F7"
+											size={14}
+										/>
+									) : (
+										<>
+											<p className="text-white break-words leading-6 text-base">
+												{message.text}
+											</p>
+											<span className="text-xs text-gray-300 text-right">
+												{dayjs(
+													message.createdAt
+												).format("h:mm A")}
+											</span>
+										</>
+									)}
+								</div>
 							</div>
-						</div>
-					);
-				})}
-			</div>
-			<div className="flex items-center gap-2">
-				<input
-					type="text"
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					className="flex-1 p-2 rounded-lg border bg-gray-800 text-white"
-					placeholder="Type a message..."
-				/>
-				<button
-					type="submit"
-					disabled={!input || sendMessageMutation?.isPending}
-					className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-				>
-					Send
-				</button>
-			</div>
-		</form>
+						);
+					})}
+				</div>
+
+				<div className="flex items-center gap-2">
+					<input
+						type="text"
+						value={input}
+						onChange={(e) => setInput(e.target.value)}
+						className="flex-1 p-2 rounded-lg border bg-gray-800 text-white"
+						placeholder="Type a message..."
+					/>
+
+					<button
+						type="submit"
+						disabled={!input || sendMessageMutation?.isPending}
+						className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition cursor-pointer"
+					>
+						Send
+					</button>
+
+					<Link
+						href={`/create/${coinAddress}`}
+						className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center justify-center"
+					>
+						Update Bot
+					</Link>
+				</div>
+			</form>
+		</div>
 	);
 };
 
