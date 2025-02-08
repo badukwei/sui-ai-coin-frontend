@@ -1,0 +1,4 @@
+export const storeAddress =
+	"0xef24934b4af4c3ec0f51d5d89a8b64722fe97c6811e05c33a49912a5ae5fc25b";
+export const configAddress =
+	"0x6146e286483e1ce00de89f5e8cea9bda1d608d2f403661bee5feb1883ab11ac1";

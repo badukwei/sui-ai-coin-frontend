@@ -1,7 +1,7 @@
 import { ELIZA_BASE_URL } from "@/constants";
 import { AIConfig } from "@/types/ai/eliza/character";
 
-const fetcher = async ({
+export const fetcher = async ({
 	url,
 	method,
 	body,
@@ -115,16 +115,13 @@ export const apiClient = {
 				body: { characterJson: config },
 			});
 			console.log("Config saved successfully:", response);
-			alert("Configuration saved successfully!");
 		} catch (error) {
 			console.error("Failed to save config:", error);
-			alert("Failed to save configuration.");
 		}
 	},
 
 	updateConfig: async (config: AIConfig, agentId: string) => {
 		try {
-			console.log(`Deleting agent: ${agentId}`);
 			const deleteResponse = await fetch(
 				`${ELIZA_BASE_URL}/agents/${agentId}`,
 				{ method: "DELETE" }

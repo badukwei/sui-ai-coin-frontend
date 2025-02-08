@@ -7,6 +7,7 @@ import {
 } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			>
 				<WalletProvider autoConnect>
 					<Component {...pageProps} />
+					<ToastContainer />
 				</WalletProvider>
 			</SuiClientProvider>
 		</QueryClientProvider>

@@ -1,9 +1,13 @@
-import { useSuiClient } from "@mysten/dapp-kit";
+import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { CoinMetadata } from "@mysten/sui/client";
 import React, { useEffect, useState } from "react";
 import { AIConfig } from "@/types/ai/eliza/character";
+import { toast } from "react-toastify";
+import { fetcher } from "@/libs/apiFactory";
+import { createBot, updateBot } from "@/utils/move/botConfig";
+import { configAddress } from "@/constants/move/store";
+import { BotInfo } from "@/types/move/bot";
 import { ELIZA_BASE_URL } from "@/constants";
-import { apiClient } from "@/libs/apiFactory";
 
 const defaultConfig: AIConfig = {
 	name: "test",
@@ -49,12 +53,32 @@ const defaultConfig: AIConfig = {
 
 interface Props {
 	coinAddress: string;
+	address?: string;
 }
 
-const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
+const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 	const [config, setConfig] = useState(defaultConfig);
 	const [coinData, setCoinData] = useState<CoinMetadata | null>(null);
+	const [botData, setBotData] = useState<BotInfo | null>(null);
+
 	const suiClient = useSuiClient();
+	const { mutateAsync: signAndExecuteTransaction } =
+		useSignAndExecuteTransaction({
+			execute: async ({ bytes, signature }) =>
+				await suiClient.executeTransactionBlock({
+					transactionBlock: bytes,
+					signature,
+					options: {
+						showBalanceChanges: true,
+						showEffects: true,
+						showEvents: true,
+						showInput: true,
+						showObjectChanges: true,
+						showRawEffects: true,
+						showRawInput: true,
+					},
+				}),
+		});
 
 	const handleChange = (field: string, value: any) => {
 		setConfig((prev) => ({ ...prev, [field]: value }));
@@ -131,80 +155,89 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 		});
 	};
 
-	// const saveConfig = async () => {
-	// 	try {
-	// 		const response = await fetch(`${ELIZA_BASE_URL}/agent/start`, {
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 			body: JSON.stringify({ characterJson: config }),
-	// 		});
-
-	// 		if (!response.ok) {
-	// 			throw new Error(
-	// 				`Error: ${response.status} ${response.statusText}`
-	// 			);
-	// 		}
-
-	// 		const data = await response.json();
-	// 		console.log("Config saved successfully:", data);
-	// 		alert("Configuration saved successfully!");
-	// 	} catch (error) {
-	// 		console.error("Failed to save config:", error);
-	// 		alert("Failed to save configuration.");
-	// 	}
-	// };
-
-	const updateConfig = async () => {
-		const agentId = "a94a8fe5-ccb1-0ba6-9c4c-0873d391e987";
+	const save = async () => {
+		if (!coinData) {
+			toast.error("Missing coin data!");
+			return;
+		}
+		if (!address) {
+			toast.error("Please log in with your wallet!");
+			return;
+		}
 
 		try {
-			console.log(`Deleting agent: ${agentId}`);
+			const response = await fetcher({
+				url: "/agent/start",
+				method: "POST",
+				body: { characterJson: config },
+			});
+			console.log(response);
+			const botId = (response.id as string) || "";
+			const { name, symbol } = coinData;
+			const botJsonString = JSON.stringify(config);
+			const { data } = await suiClient.getCoins({
+				owner: address,
+				coinType: coinAddress,
+			});
+			const coinObjectId = data[0].coinObjectId;
+			const suiResponse = await createBot(
+				coinAddress,
+				coinAddress,
+				coinObjectId,
+				botId,
+				name,
+				symbol,
+				botJsonString,
+				signAndExecuteTransaction
+			);
+			console.log(suiResponse);
+			toast.success("Bot created successfully!");
+		} catch (error) {
+			console.error(error);
+			toast.error("An error occurred while creating the bot!");
+		}
+	};
+
+	const update = async () => {
+		const agentId = botData?.bot_id;
+		if (!agentId) {
+			toast.error("Missing bot data!");
+			return;
+		}
+		if (!address) {
+			toast.error("Please log in with your wallet!");
+			return;
+		}
+		try {
 			const deleteResponse = await fetch(
 				`${ELIZA_BASE_URL}/agents/${agentId}`,
 				{ method: "DELETE" }
 			);
-
-			if (!deleteResponse.ok) {
-				throw new Error(
-					`Failed to delete agent: ${deleteResponse.status} ${deleteResponse.statusText}`
-				);
-			}
-
-			console.log("Agent deleted successfully");
-			console.log("Starting new agent with updated config...");
-			const response = await fetch("http://localhost:8080/agent/start", {
+			console.log(deleteResponse);
+			const response = await fetcher({
+				url: "/agent/start",
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ characterJson: config }),
+				body: { characterJson: config },
 			});
-
-			if (!response.ok) {
-				throw new Error(
-					`Error starting agent: ${response.status} ${response.statusText}`
-				);
-			}
-
-			const data = await response.json();
-			console.log("Agent restarted successfully:", data);
-			alert("Configuration updated and agent restarted successfully!");
+			console.log(response);
+			const botJsonString = JSON.stringify(config);
+			const { bot_id, ca, name, symbol } = botData;
+			const suiResponse = await updateBot(
+				coinAddress,
+				address,
+				coinAddress,
+				bot_id,
+				name,
+				symbol,
+				botJsonString,
+				signAndExecuteTransaction
+			);
+			console.log(suiResponse);
+			toast.success("Bot updated successfully!");
 		} catch (error) {
-			console.error("Failed to update config:", error);
-			alert("Failed to update configuration.");
+			toast.error("An error occurred while updating the bot!");
 		}
 	};
-
-    const save = () => {
-        apiClient.saveConfig(config);
-    }
-
-    const update = () => {
-        const agentId = "ebdc86d6-96fa-00e0-b114-b4603f47bb17";
-        apiClient.updateConfig(config, agentId);
-    }
 
 	useEffect(() => {
 		const fetchCoinData = async () => {
@@ -223,6 +256,40 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 		if (coinAddress) {
 			fetchCoinData();
 		}
+	}, [coinAddress]);
+
+	useEffect(() => {
+		const run = async () => {
+			const name = {
+				type: "0x1::string::String",
+				value: coinAddress,
+			};
+			try {
+				const { data } = await suiClient.getDynamicFieldObject({
+					parentId: configAddress,
+					name: name,
+				});
+				const objectId = data?.objectId;
+				if (!objectId) throw new Error();
+				const response = await suiClient.getObject({
+					id: objectId,
+					options: {
+						showContent: true,
+					},
+				});
+				const object = response.data;
+				if (object?.content?.dataType !== "moveObject")
+					throw new Error();
+				const botInfo = object.content.fields as unknown as BotInfo;
+				setBotData(botInfo);
+				const botConfig = JSON.parse(botInfo.bot_json) as AIConfig;
+				console.log(botConfig);
+				setConfig(botConfig);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		run();
 	}, [coinAddress]);
 
 	return (
@@ -510,18 +577,21 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress }) => {
 				</div>
 
 				{/* Save Button */}
-				<button
-					onClick={save}
-					className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
-				>
-					Save Config
-				</button>
-				<button
-					onClick={update}
-					className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
-				>
-					Update Config
-				</button>
+				{!botData ? (
+					<button
+						onClick={save}
+						className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
+					>
+						Save Config
+					</button>
+				) : (
+					<button
+						onClick={update}
+						className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
+					>
+						Update Config
+					</button>
+				)}
 			</div>
 		</div>
 	);
