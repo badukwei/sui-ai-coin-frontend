@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Header from "@/components/layout/Header";
 import { useCurrentWallet } from "@mysten/dapp-kit";
 import ChatBox from "@/components/coin/ChatBox";

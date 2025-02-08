@@ -1,8 +1,12 @@
 import { apiClient } from "@/libs/apiFactory";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { PacmanLoader } from "react-spinners";
+import { BotInfo } from "@/types/move/bot";
+import { useSuiClient } from "@mysten/dapp-kit";
+import { configAddress } from "@/constants/move/store";
+import { ContentWithUser } from "@/types/eliza/message";
 
 interface Props {
 	coinAddress?: string;
@@ -10,9 +14,9 @@ interface Props {
 
 const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 	const [input, setInput] = useState<string>("");
+	const [agentId, setAgentId] = useState<string>("");
 
-	const agentId = "a94a8fe5-ccb1-0ba6-9c4c-0873d391e987";
-
+	const suiClient = useSuiClient();
 	const queryClient = useQueryClient();
 
 	const sendMessageMutation = useMutation({
@@ -24,11 +28,11 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 			message: string;
 			selectedFile?: File | null;
 		}) => apiClient.sendMessage(agentId, message, selectedFile),
-		onSuccess: (newMessages: any[]) => {
+		onSuccess: (newMessages: ContentWithUser[]) => {
 			console.log(newMessages);
 			queryClient.setQueryData(
 				["messages", agentId],
-				(old: any[] = []) => [
+				(old: ContentWithUser[] = []) => [
 					...old.filter((msg) => !msg.isLoading),
 					...newMessages.map((msg) => ({
 						...msg,
@@ -60,10 +64,10 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 			},
 		];
 
-		queryClient.setQueryData(["messages", agentId], (old: any[] = []) => [
-			...old,
-			...newMessages,
-		]);
+		queryClient.setQueryData(
+			["messages", agentId],
+			(old: ContentWithUser[] = []) => [...old, ...newMessages]
+		);
 
 		sendMessageMutation.mutate({
 			message: input,
@@ -74,12 +78,43 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 	};
 
 	const messages =
-		queryClient.getQueryData<any[]>(["messages", agentId]) || [];
-
-	console.log(messages)
+		queryClient.getQueryData<ContentWithUser[]>(["messages", agentId]) ||
+		[];
 
 	const getMessageVariant = (role: string) =>
 		role !== "user" ? "received" : "sent";
+
+	useEffect(() => {
+		const run = async () => {
+			const name = {
+				type: "0x1::string::String",
+				value: coinAddress,
+			};
+			try {
+				const { data } = await suiClient.getDynamicFieldObject({
+					parentId: configAddress,
+					name: name,
+				});
+				const objectId = data?.objectId;
+				if (!objectId) throw new Error();
+				const response = await suiClient.getObject({
+					id: objectId,
+					options: {
+						showContent: true,
+					},
+				});
+				const object = response.data;
+				if (object?.content?.dataType !== "moveObject")
+					throw new Error();
+				const botInfo = object.content.fields as unknown as BotInfo;
+				const agentId = botInfo.bot_id;
+				setAgentId(agentId);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		run();
+	}, [coinAddress, suiClient]);
 
 	return (
 		<form

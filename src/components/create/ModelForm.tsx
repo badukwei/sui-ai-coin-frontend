@@ -80,7 +80,10 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				}),
 		});
 
-	const handleChange = (field: string, value: any) => {
+	const handleChange = (
+		field: string,
+		value: string | number | boolean | string[]
+	) => {
 		setConfig((prev) => ({ ...prev, [field]: value }));
 	};
 
@@ -221,7 +224,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			});
 			console.log(response);
 			const botJsonString = JSON.stringify(config);
-			const { bot_id, ca, name, symbol } = botData;
+			const { bot_id, name, symbol } = botData;
 			const suiResponse = await updateBot(
 				coinAddress,
 				address,
@@ -235,6 +238,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			console.log(suiResponse);
 			toast.success("Bot updated successfully!");
 		} catch (error) {
+			console.error(error);
 			toast.error("An error occurred while updating the bot!");
 		}
 	};
@@ -256,7 +260,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 		if (coinAddress) {
 			fetchCoinData();
 		}
-	}, [coinAddress]);
+	}, [coinAddress, suiClient]);
 
 	useEffect(() => {
 		const run = async () => {
@@ -290,7 +294,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			}
 		};
 		run();
-	}, [coinAddress]);
+	}, [coinAddress, suiClient]);
 
 	return (
 		<div className="w-full max-w-3xl mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">

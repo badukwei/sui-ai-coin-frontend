@@ -30,7 +30,7 @@ const CoinInfo: React.FC<CoinInfoProps> = ({ coinAddress }) => {
 		if (coinAddress) {
 			fetchCoinData();
 		}
-	}, [coinAddress]);
+	}, [coinAddress, suiClient]);
 
 	return (
 		<div className="w-full max-w-3xl bg-gray-800 text-white p-6 rounded-lg text-center shadow-lg">

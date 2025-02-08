@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import truncateAddress from "@/utils/move/format/truncateAddress";
 import { FiExternalLink } from "react-icons/fi";
-import { useRouter } from "next/router";
 
 interface Props {
 	name: string;
@@ -21,7 +20,6 @@ const CoinCard: React.FC<Props> = ({
 	imageUrl,
 	coinAddress,
 }) => {
-	const router = useRouter();
 	return (
 		<div
 			className="bg-[rgba(10,25,47,0.95)] border border-[rgba(58,110,165,0.8)] 

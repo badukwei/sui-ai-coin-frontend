@@ -1,11 +1,15 @@
 import Header from "@/components/layout/Header";
 import EventList from "@/components/list/EventList";
 import { useCurrentWallet } from "@mysten/dapp-kit";
-import React from "react";
+import React, { useEffect } from "react";
 
 const ListPage = () => {
 	const { currentWallet } = useCurrentWallet();
 	const address = currentWallet?.accounts?.[0].address;
+
+	useEffect(() => {
+		console.log("Wallet Updated:", currentWallet);
+	}, [currentWallet]);	
 
 	return (
 		<div className="flex flex-col min-h-screen">
