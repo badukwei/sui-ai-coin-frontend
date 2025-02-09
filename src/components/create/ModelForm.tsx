@@ -8,48 +8,12 @@ import { createBot, updateBot } from "@/utils/move/botConfig";
 import { configAddress } from "@/constants/move/store";
 import { BotInfo } from "@/types/move/bot";
 import { ELIZA_BASE_URL } from "@/constants";
-
-const defaultConfig: AIConfig = {
-	name: "test",
-	modelProvider: "openai",
-	clients: [],
-	settings: {
-		voice: { model: "en-US-neural" },
-	},
-	plugins: [],
-	bio: ["AI researcher and educator focused on practical applications"],
-	lore: [
-		"Pioneer in open-source AI development",
-		"Advocate for AI accessibility",
-	],
-	messageExamples: [
-		[
-			{
-				user: "{{user1}}",
-				content: { text: "What about the border crisis?" },
-			},
-			{
-				user: "test",
-				content: { text: "What about the border crisis?" },
-			},
-		],
-	],
-	postExamples: [
-		"End inflation and make America affordable again.",
-		"America needs law and order, not crime creation.",
-	],
-	topics: [
-		"artificial intelligence",
-		"machine learning",
-		"technology education",
-	],
-	style: {
-		all: ["explain complex topics simply", "be encouraging and supportive"],
-		chat: ["use relevant examples", "check understanding"],
-		post: ["focus on practical insights", "encourage learning"],
-	},
-	adjectives: ["knowledgeable", "approachable", "practical"],
-};
+import { defaultConfig } from "@/constants/ai/botConfig";
+import Lore from "./Lore";
+import Bio from "./Bio";
+import PostExample from "./PostExample";
+import Topic from "./Topic";
+import Adjective from "./Adjective";
 
 interface Props {
 	coinAddress: string;
@@ -100,6 +64,22 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			setConfig((prev) => ({
 				...prev,
 				[field]: [...(prev[field] as string[]), ""],
+			}));
+		} else {
+			console.error(
+				`Error: '${field}' is not an array and cannot be modified dynamically.`
+			);
+		}
+	};
+
+	const handleAddArrayItemWithContent = <K extends keyof AIConfig>(
+		field: K,
+		content: string
+	) => {
+		if (Array.isArray(config[field])) {
+			setConfig((prev) => ({
+				...prev,
+				[field]: [...(prev[field] as string[]), content], // Add provided content
 			}));
 		} else {
 			console.error(
@@ -304,7 +284,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			<div className="d-flex flex-col gap-4">
 				{/* Name */}
 				<div>
-					<h3 className="text-lg font-semibold mt-6">Name</h3>
+					<h3 className="text-lg font-semibold mt-6 mb-2">Name</h3>
 					<input
 						type="text"
 						value={config.name}
@@ -315,7 +295,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 
 				{/* Model Provider */}
 				<div>
-					<h3 className="text-lg font-semibold mt-6">
+					<h3 className="text-lg font-semibold mt-6 mb-2">
 						Model Provider
 					</h3>
 					<input
@@ -328,7 +308,9 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 
 				{/* Voice Model */}
 				<div>
-					<h3 className="text-lg font-semibold mt-6">Voice Model</h3>
+					<h3 className="text-lg font-semibold mt-6 mb-2">
+						Voice Model
+					</h3>
 					<input
 						type="text"
 						value={config.settings.voice.model}
@@ -338,62 +320,30 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				</div>
 
 				{/* Bio */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6">Bio</h3>
-					{config.bio.map((item, index) => (
-						<input
-							key={index}
-							type="text"
-							value={item}
-							onChange={(e) =>
-								handleArrayChange("bio", index, e.target.value)
-							}
-							className="w-full p-2 rounded bg-gray-800 text-white mb-2"
-						/>
-					))}
-				</div>
+				<Bio
+					config={config}
+					handleAddArrayItem={handleAddArrayItem}
+					handleArrayChange={handleArrayChange}
+					handleRemoveArrayItem={handleRemoveArrayItem}
+					handleAddArrayItemWithContent={
+						handleAddArrayItemWithContent
+					}
+				/>
 
 				{/* Lore */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6">Lore</h3>
-					{config.lore.map((item, index) => (
-						<div
-							key={index}
-							className="flex items-center gap-2 mb-2"
-						>
-							<input
-								type="text"
-								value={item}
-								onChange={(e) =>
-									handleArrayChange(
-										"lore",
-										index,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-800 text-white"
-							/>
-							<button
-								onClick={() =>
-									handleRemoveArrayItem("lore", index)
-								}
-								className="p-2 bg-red-500 text-white rounded"
-							>
-								✖
-							</button>
-						</div>
-					))}
-					<button
-						onClick={() => handleAddArrayItem("lore")}
-						className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-					>
-						+ Add Lore
-					</button>
-				</div>
+				<Lore
+					config={config}
+					handleAddArrayItem={handleAddArrayItem}
+					handleArrayChange={handleArrayChange}
+					handleRemoveArrayItem={handleRemoveArrayItem}
+					handleAddArrayItemWithContent={
+						handleAddArrayItemWithContent
+					}
+				/>
 
 				{/* Message Examples */}
 				<div>
-					<h3 className="text-lg font-semibold mt-6">
+					<h3 className="text-lg font-semibold mt-6 mb-2">
 						Message Examples
 					</h3>
 					{config.messageExamples.map((examplePair, pairIndex) => (
@@ -457,127 +407,46 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				</div>
 
 				{/* Post Examples */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6">
-						Post Examples
-					</h3>
-					{config.postExamples.map((post, index) => (
-						<div
-							key={index}
-							className="flex items-center gap-2 mb-2"
-						>
-							<input
-								type="text"
-								value={post}
-								onChange={(e) =>
-									handleArrayChange(
-										"postExamples",
-										index,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-800 text-white"
-							/>
-							<button
-								onClick={() =>
-									handleRemoveArrayItem("postExamples", index)
-								}
-								className="p-2 bg-red-500 text-white rounded"
-							>
-								✖
-							</button>
-						</div>
-					))}
-					<button
-						onClick={() => handleAddArrayItem("postExamples")}
-						className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-					>
-						+ Add Post Example
-					</button>
-				</div>
+				<PostExample
+					config={config}
+					handleAddArrayItem={handleAddArrayItem}
+					handleArrayChange={handleArrayChange}
+					handleRemoveArrayItem={handleRemoveArrayItem}
+					handleAddArrayItemWithContent={
+						handleAddArrayItemWithContent
+					}
+				/>
 
 				{/* Topics */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6">Topics</h3>
-					{config.topics.map((topic, index) => (
-						<div
-							key={index}
-							className="flex items-center gap-2 mb-2"
-						>
-							<input
-								type="text"
-								value={topic}
-								onChange={(e) =>
-									handleArrayChange(
-										"topics",
-										index,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-800 text-white"
-							/>
-							<button
-								onClick={() =>
-									handleRemoveArrayItem("topics", index)
-								}
-								className="p-2 bg-red-500 text-white rounded"
-							>
-								✖
-							</button>
-						</div>
-					))}
-					<button
-						onClick={() => handleAddArrayItem("topics")}
-						className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-					>
-						+ Add Topic
-					</button>
-				</div>
+				<Topic
+					config={config}
+					handleAddArrayItem={handleAddArrayItem}
+					handleArrayChange={handleArrayChange}
+					handleRemoveArrayItem={handleRemoveArrayItem}
+					handleAddArrayItemWithContent={
+						handleAddArrayItemWithContent
+					}
+				/>
 
 				{/* Adjectives */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6">Adjectives</h3>
-					{config.adjectives.map((adj, index) => (
-						<div
-							key={index}
-							className="flex items-center gap-2 mb-2"
-						>
-							<input
-								type="text"
-								value={adj}
-								onChange={(e) =>
-									handleArrayChange(
-										"adjectives",
-										index,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-800 text-white"
-							/>
-							<button
-								onClick={() =>
-									handleRemoveArrayItem("adjectives", index)
-								}
-								className="p-2 bg-red-500 text-white rounded"
-							>
-								✖
-							</button>
-						</div>
-					))}
-					<button
-						onClick={() => handleAddArrayItem("adjectives")}
-						className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-					>
-						+ Add Adjective
-					</button>
-				</div>
+				<Adjective
+					config={config}
+					handleAddArrayItem={handleAddArrayItem}
+					handleArrayChange={handleArrayChange}
+					handleRemoveArrayItem={handleRemoveArrayItem}
+					handleAddArrayItemWithContent={
+						handleAddArrayItemWithContent
+					}
+				/>
 
 				{/* JSON Preview */}
 				<div className="mt-6 p-4 bg-gray-800 rounded-lg">
 					<h3 className="text-lg font-semibold mb-2">JSON Preview</h3>
-					<pre className="text-sm bg-gray-700 p-3 rounded-lg">
-						{JSON.stringify(config, null, 2)}
-					</pre>
+					<div className="overflow-x-auto max-w-full bg-gray-700 p-3 rounded-lg">
+						<pre className="text-sm whitespace-pre-wrap break-words">
+							{JSON.stringify(config, null, 2)}
+						</pre>
+					</div>
 				</div>
 
 				{/* Save Button */}
