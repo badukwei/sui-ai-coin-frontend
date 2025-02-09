@@ -21,7 +21,7 @@ const Header: React.FC<Props> = ({ address }) => {
 				boxShadow: "0 2px 5px rgba(0, 0, 0, 0.3)",
 			}}
 		>
-			<h1 className="text-xl font-bold text-white">AI SUI MEME</h1>
+			<h1 className="text-xl font-bold text-white">AI SUI COIN</h1>
 
 			<nav className="hidden md:flex space-x-8">
 				<Link

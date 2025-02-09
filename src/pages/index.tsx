@@ -38,7 +38,7 @@ export default function Home() {
 						</h2>
 						<p className="text-gray-400 text-lg lg:text-xl mt-4">
 							Simply enter your text, and our AI will help you
-							create a unique memecoin on the Sui blockchain.
+							create a unique coin and AI agent on the Sui blockchain.
 						</p>
 
 						<div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
