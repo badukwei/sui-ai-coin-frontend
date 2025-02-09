@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { AIConfig } from "@/types/ai/eliza/character";
 import { toast } from "react-toastify";
 import { fetcher } from "@/libs/apiFactory";
-import { createBot, updateBot } from "@/utils/move/botConfig";
+import { updateBot } from "@/utils/move/updateBot";
 import { configAddress } from "@/constants/move/store";
 import { BotInfo } from "@/types/move/bot";
 import { ELIZA_BASE_URL } from "@/constants";
@@ -79,7 +79,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 		if (Array.isArray(config[field])) {
 			setConfig((prev) => ({
 				...prev,
-				[field]: [...(prev[field] as string[]), content], // Add provided content
+				[field]: [...(prev[field] as string[]), content],
 			}));
 		} else {
 			console.error(
@@ -138,49 +138,6 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 		});
 	};
 
-	const save = async () => {
-		if (!coinData) {
-			toast.error("Missing coin data!");
-			return;
-		}
-		if (!address) {
-			toast.error("Please log in with your wallet!");
-			return;
-		}
-
-		try {
-			const response = await fetcher({
-				url: "/agent/start",
-				method: "POST",
-				body: { characterJson: config },
-			});
-			console.log(response);
-			const botId = (response.id as string) || "";
-			const { name, symbol } = coinData;
-			const botJsonString = JSON.stringify(config);
-			const { data } = await suiClient.getCoins({
-				owner: address,
-				coinType: coinAddress,
-			});
-			const coinObjectId = data[0].coinObjectId;
-			const suiResponse = await createBot(
-				coinAddress,
-				coinAddress,
-				coinObjectId,
-				botId,
-				name,
-				symbol,
-				botJsonString,
-				signAndExecuteTransaction
-			);
-			console.log(suiResponse);
-			toast.success("Bot created successfully!");
-		} catch (error) {
-			console.error(error);
-			toast.error("An error occurred while creating the bot!");
-		}
-	};
-
 	const update = async () => {
 		const agentId = botData?.bot_id;
 		if (!agentId) {
@@ -237,9 +194,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			}
 		};
 
-		if (coinAddress) {
-			fetchCoinData();
-		}
+		fetchCoinData();
 	}, [coinAddress, suiClient]);
 
 	useEffect(() => {
@@ -450,21 +405,13 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				</div>
 
 				{/* Save Button */}
-				{!botData ? (
-					<button
-						onClick={save}
-						className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
-					>
-						Save Config
-					</button>
-				) : (
-					<button
-						onClick={update}
-						className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
-					>
-						Update Config
-					</button>
-				)}
+				<button
+					onClick={update}
+					className="mt-4 w-full p-3 bg-blue-500 hover:bg-blue-600 rounded-lg"
+					disabled={!coinData}
+				>
+					Update Config
+				</button>
 			</div>
 		</div>
 	);

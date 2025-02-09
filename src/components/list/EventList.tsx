@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import CoinCard from "./CoinCard";
 import { MetadataWithTime } from "@/types/move/metadata";
+import { createEventAddress } from "@/constants/move/store";
 
 const CardList = () => {
 	const suiClient = useSuiClient();
@@ -15,8 +16,7 @@ const CardList = () => {
 			try {
 				const { data } = await suiClient.queryEvents({
 					query: {
-						MoveEventType:
-							"0x10b42a0334d23a7669178271a256a52f2e288b3cbb3fedc6f60b16dfd5a441b8::claim::Event",
+						MoveEventType: createEventAddress,
 					},
 				});
 
@@ -27,7 +27,7 @@ const CardList = () => {
 					description:
 						event.parsedJson.description ||
 						"No description available.",
-					imageUrl: event.parsedJson.uri,
+					imageUrl: event.parsedJson.url,
 					coinAddress: event.parsedJson.ca,
 					timestamp: parseInt(event.timestampMs, 10),
 				}));

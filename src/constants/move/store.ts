@@ -1,4 +1,6 @@
-export const storeAddress =
-	"0xef24934b4af4c3ec0f51d5d89a8b64722fe97c6811e05c33a49912a5ae5fc25b";
+export const storePackageAddress =
+	"0x86f7408d60cbeebb0fbad6fcd9cfac9a952fe841d345566b29457b2cce648983";
 export const configAddress =
-	"0x6146e286483e1ce00de89f5e8cea9bda1d608d2f403661bee5feb1883ab11ac1";
+	"0xaf9300477a8a91747aabb64833c30e7e443aeba1fda354be1d10c09d800e3f5b";
+export const createEventAddress =
+	"0x86f7408d60cbeebb0fbad6fcd9cfac9a952fe841d345566b29457b2cce648983::store::CreateBotEvent";

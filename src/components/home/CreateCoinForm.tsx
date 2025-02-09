@@ -2,7 +2,7 @@ import fetchImage from "@/utils/ai/falAI";
 import fetchMetadata from "@/utils/ai/openAI";
 import formatCreateImagePrompt from "@/utils/move/format/imagePrompt";
 import formatCreateTemplateResponse from "@/utils/move/format/templateResponse";
-import { mintWithEvent } from "@/utils/move/mintWithEvent";
+import { createBot } from "@/utils/move/createBot";
 import updateTemplate from "@/utils/move/template";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import init from "@mysten/move-bytecode-template";
@@ -20,6 +20,8 @@ import LoadingModal from "../modal/LoadingModal";
 import SuccessModal from "../modal/SuccessModal";
 import { IMetadata } from "@/types/move/metadata";
 import CustomConnectButton from "../common/CustomConnectButton";
+import { fetcher } from "@/libs/apiFactory";
+import { defaultConfig } from "@/constants/ai/botConfig";
 
 interface Props {
 	address?: string;
@@ -100,25 +102,40 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 				formatCreateTemplateResponse(netWorkResponse);
 			if (!coinType || !treasuryCap || !recipient) throw new Error();
 
-			const result = await mintWithEvent(
+			const botConfig = {
+				...defaultConfig,
+				name: coinAddress,
+			};
+
+			const response = await fetcher({
+				url: "/agent/start",
+				method: "POST",
+				body: { characterJson: botConfig },
+			});
+
+			const botId = (response.id as string) || "";
+			const botJson = JSON.stringify(botConfig);
+
+			const result = await createBot(
 				coinType,
 				treasuryCap,
 				coinAddress,
+				botId,
 				metadata.name,
 				metadata.symbol,
 				metadata.description,
 				imageUrl,
-				recipient,
+				botJson,
 				signAndExecuteTransaction
 			);
 			console.log(result);
 
 			setMetadata({
-        ...metadata,
+				...metadata,
 				imageUrl,
 				coinAddress,
 			});
-      setIsLoading(false);
+			setIsLoading(false);
 		} catch (error) {
 			console.error(error);
 			setIsLoading(false);
@@ -149,7 +166,6 @@ const CreateCoinForm = forwardRef(({ address }: Props, ref) => {
 
 	return (
 		<section className="w-full flex  flex-col justify-center items-center">
-			{/* Improved Title with Downward Icon */}
 			<h2 className="text-gray-200 text-2xl font-bold p-2 w-full max-w-3xl text-left tracking-wide flex items-center gap-2">
 				Create Your Memecoin
 				<FaArrowDown className="text-blue-400 text-xl" />
