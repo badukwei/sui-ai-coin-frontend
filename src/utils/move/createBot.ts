@@ -40,6 +40,5 @@ export async function createBot(
 		transaction: tx,
 	});
 
-	console.log("Mint and transfer successful:", response);
 	return response;
 }

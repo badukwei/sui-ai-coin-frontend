@@ -4,20 +4,45 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { PacmanLoader } from "react-spinners";
 import { BotInfo } from "@/types/move/bot";
-import { useSuiClient } from "@mysten/dapp-kit";
-import { configAddress } from "@/constants/move/store";
+import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
+import { chatFee, configAddress } from "@/constants/move/store";
 import { ContentWithUser } from "@/types/eliza/message";
 import Link from "next/link";
+import { chatWithBot } from "@/utils/move/chat";
+import { toast } from "react-toastify";
+import { donateToBot } from "@/utils/move/donate";
+import { mergeCoins } from "@/utils/move/mergeCoin";
+import DonateInputModal from "../modal/DonateInputModal";
 
 interface Props {
+	address?: string;
 	coinAddress?: string;
 }
 
-const ChatBox: React.FC<Props> = ({ coinAddress }) => {
+const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 	const [input, setInput] = useState<string>("");
 	const [agentId, setAgentId] = useState<string>("");
+	const [totalBalance, setTotalBalance] = useState<number>(0);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const suiClient = useSuiClient();
+	const { mutateAsync: signAndExecuteTransaction } =
+		useSignAndExecuteTransaction({
+			execute: async ({ bytes, signature }) =>
+				await suiClient.executeTransactionBlock({
+					transactionBlock: bytes,
+					signature,
+					options: {
+						showBalanceChanges: true,
+						showEffects: true,
+						showEvents: true,
+						showInput: true,
+						showObjectChanges: true,
+						showRawEffects: true,
+						showRawInput: true,
+					},
+				}),
+		});
 	const queryClient = useQueryClient();
 
 	const sendMessageMutation = useMutation({
@@ -47,7 +72,7 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 		},
 	});
 
-	const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (!input.trim()) return;
 
@@ -76,6 +101,71 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 		});
 
 		setInput("");
+	};
+
+	const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		if (!address || !coinAddress) return;
+		try {
+			const { data } = await suiClient.getCoins({
+				owner: address,
+				coinType: coinAddress,
+			});
+			let totalBalance = 0;
+			for (const coin of data) {
+				totalBalance += Number(coin.balance);
+			}
+			if (totalBalance < chatFee) throw new Error();
+
+			if (Number(data[0].balance) < chatFee) {
+				await mergeCoins(data, signAndExecuteTransaction);
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			const suiResponse = await chatWithBot(
+				data,
+				coinAddress,
+				address,
+				coinAddress,
+				signAndExecuteTransaction
+			);
+			if (!suiResponse) throw new Error();
+			sendMessage(e);
+		} catch (error) {
+			console.error(error);
+			toast.error("Fail sending message!");
+		}
+	};
+
+	const handleDonate = async (amount: number) => {
+		if (!address || !coinAddress) return;
+		try {
+			const { data } = await suiClient.getCoins({
+				owner: address,
+				coinType: coinAddress,
+			});
+
+			await mergeCoins(data, signAndExecuteTransaction);
+
+			if (Number(data[0].balance) < amount) {
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+			}
+
+			const suiResponse = await donateToBot(
+				data,
+				coinAddress,
+				address,
+				amount,
+				coinAddress,
+				signAndExecuteTransaction
+			);
+			if (!suiResponse) throw new Error();
+			toast.success("Thanks for the donation!");
+		} catch (error) {
+			console.error(error);
+			toast.error("Fail to Donate! Please check the balance!");
+		}
 	};
 
 	const messages =
@@ -116,6 +206,23 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 		};
 		run();
 	}, [coinAddress, suiClient]);
+
+	useEffect(() => {
+		const run = async () => {
+			if (!address || !coinAddress) return;
+			const { data } = await suiClient.getCoins({
+				owner: address,
+				coinType: coinAddress,
+			});
+
+			let totalBalance = 0;
+			for (const coin of data) {
+				totalBalance += Number(coin.balance);
+			}
+			console.log(totalBalance);
+		};
+		run();
+	}, [address, suiClient]);
 
 	return (
 		<div className="relative w-full max-w-3xl">
@@ -233,14 +340,31 @@ const ChatBox: React.FC<Props> = ({ coinAddress }) => {
 						Send
 					</button>
 
-					<Link
+					<button
+						type="button"
+						disabled={sendMessageMutation?.isPending}
+						className="px-4 py-2 text-white rounded-lg transition flex items-center justify-center 
+               bg-gradient-to-r from-yellow-400 to-orange-500 
+               hover:from-yellow-500 hover:to-orange-600 
+               active:scale-95 shadow-lg shadow-orange-400/50"
+						onClick={() => setIsModalOpen(true)}
+					>
+						Donate
+					</button>
+
+					{/* <Link
 						href={`/create/${coinAddress}`}
 						className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center justify-center"
 					>
 						Update Bot
-					</Link>
+					</Link> */}
 				</div>
 			</form>
+			<DonateInputModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onSubmit={handleDonate}
+			/>
 		</div>
 	);
 };

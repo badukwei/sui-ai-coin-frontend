@@ -1,36 +1,33 @@
 import { configAddress, storePackageAddress } from "@/constants/move/store";
-import { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { CoinStruct, SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
-export async function updateBot(
+export async function donateToBot(
+	balances: CoinStruct[],
 	coinType: string,
-	recipient: string,
+	sender: string,
+	amountToSend: number,
 	coinAddress: string,
-	botId: string,
-	name: string,
-	symbol: string,
-	botJsonString: string,
 	signAndExecuteTransaction: (args: {
 		transaction: Transaction;
 	}) => Promise<SuiTransactionBlockResponse>
 ) {
 	const tx = new Transaction();
 
+	if (balances.length === 0) return;
+
+	const coin = tx.splitCoins(tx.object(balances[0].coinObjectId), [amountToSend]);
+
 	tx.moveCall({
-		target: `${storePackageAddress}::store::update_bot`,
+		target: `${storePackageAddress}::store::donate_to_bot`,
 		typeArguments: [coinType],
 		arguments: [
 			tx.object(configAddress),
-			tx.pure.address(recipient),
-			tx.pure.string(botId),
-			tx.pure.string(name),
-			tx.pure.string(symbol),
+			tx.object(coin),
+			tx.pure.address(sender),
 			tx.pure.string(coinAddress),
-			tx.pure.string(botJsonString),
 		],
 	});
-
-	tx.setGasBudget(200000000);
 
 	const response = await signAndExecuteTransaction({
 		transaction: tx,
@@ -38,4 +35,3 @@ export async function updateBot(
 
 	return response;
 }
-

@@ -28,7 +28,7 @@ const CoinPage = () => {
 				{normalizedCoinAddress && (
 					<CoinInfo coinAddress={normalizedCoinAddress} />
 				)}
-				<ChatBox coinAddress={normalizedCoinAddress} />
+				<ChatBox coinAddress={normalizedCoinAddress} address={address}/>
 			</main>
 		</div>
 	);
