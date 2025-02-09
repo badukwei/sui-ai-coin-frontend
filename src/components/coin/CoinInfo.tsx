@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiExternalLink } from "react-icons/fi";
 import truncateAddress from "@/utils/move/format/truncateAddress";
+import { toast } from "react-toastify";
 
 interface CoinInfoProps {
 	coinAddress: string;
@@ -24,6 +25,7 @@ const CoinInfo: React.FC<CoinInfoProps> = ({ coinAddress }) => {
 				console.log("Fetched Coin Data:", data);
 			} catch (error) {
 				console.error("Error fetching coin data:", error);
+				toast.error("Can't find the coin!");
 			}
 		};
 
