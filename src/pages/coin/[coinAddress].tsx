@@ -4,12 +4,13 @@ import { useCurrentWallet } from "@mysten/dapp-kit";
 import ChatBox from "@/components/coin/ChatBox";
 import { useRouter } from "next/router";
 import CoinInfo from "@/components/coin/CoinInfo";
+import EventList from "@/components/coin/EventList";
 
 const CoinPage = () => {
 	const { currentWallet } = useCurrentWallet();
 	const address = currentWallet?.accounts?.[0]?.address;
 
-    const router = useRouter();
+	const router = useRouter();
 	const { coinAddress } = router.query;
 
 	const normalizedCoinAddress =
@@ -26,9 +27,16 @@ const CoinPage = () => {
 				}}
 			>
 				{normalizedCoinAddress && (
-					<CoinInfo coinAddress={normalizedCoinAddress} />
+					<CoinInfo
+						coinAddress={normalizedCoinAddress}
+						address={address}
+					/>
 				)}
-				<ChatBox coinAddress={normalizedCoinAddress} address={address}/>
+				<ChatBox
+					coinAddress={normalizedCoinAddress}
+					address={address}
+				/>
+				<EventList />
 			</main>
 		</div>
 	);

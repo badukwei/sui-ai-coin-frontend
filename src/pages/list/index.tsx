@@ -1,5 +1,5 @@
 import Header from "@/components/layout/Header";
-import EventList from "@/components/list/EventList";
+import EventList from "@/components/list/CardList";
 import { useCurrentWallet } from "@mysten/dapp-kit";
 import React, { useEffect } from "react";
 

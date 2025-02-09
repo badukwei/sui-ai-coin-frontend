@@ -22,7 +22,6 @@ interface Props {
 const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 	const [input, setInput] = useState<string>("");
 	const [agentId, setAgentId] = useState<string>("");
-	const [totalBalance, setTotalBalance] = useState<number>(0);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const suiClient = useSuiClient();
@@ -74,7 +73,6 @@ const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 
 	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (!input.trim()) return;
 
 		const newMessages = [
 			{
@@ -105,6 +103,10 @@ const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 
 	const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!input.trim()) {
+			toast.error("Please enter the text!");
+			return;
+		}
 		if (!address || !coinAddress) return;
 		try {
 			const { data } = await suiClient.getCoins({
@@ -206,23 +208,6 @@ const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 		};
 		run();
 	}, [coinAddress, suiClient]);
-
-	useEffect(() => {
-		const run = async () => {
-			if (!address || !coinAddress) return;
-			const { data } = await suiClient.getCoins({
-				owner: address,
-				coinType: coinAddress,
-			});
-
-			let totalBalance = 0;
-			for (const coin of data) {
-				totalBalance += Number(coin.balance);
-			}
-			console.log(totalBalance);
-		};
-		run();
-	}, [address, suiClient]);
 
 	return (
 		<div className="relative w-full max-w-3xl">
@@ -334,7 +319,7 @@ const ChatBox: React.FC<Props> = ({ address, coinAddress }) => {
 
 					<button
 						type="submit"
-						disabled={!input || sendMessageMutation?.isPending}
+						disabled={sendMessageMutation?.isPending}
 						className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition cursor-pointer"
 					>
 						Send

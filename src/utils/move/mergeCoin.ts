@@ -1,4 +1,3 @@
-import { configAddress, storePackageAddress } from "@/constants/move/store";
 import { CoinStruct, SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 

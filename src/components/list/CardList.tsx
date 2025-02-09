@@ -6,10 +6,11 @@ import { MetadataWithTime } from "@/types/move/metadata";
 import { createEventAddress } from "@/constants/move/store";
 
 const CardList = () => {
-	const suiClient = useSuiClient();
 	const [memecoins, setMemecoins] = useState<MetadataWithTime[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+	
+	const suiClient = useSuiClient();
 
 	useEffect(() => {
 		const fetchEvents = async () => {
