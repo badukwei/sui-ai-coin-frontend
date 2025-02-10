@@ -1,4 +1,5 @@
 import {
+    updateEventAddress,
 	chatEventAddress,
 	donateEventAddress,
 } from "@/constants/move/store";
@@ -58,6 +59,14 @@ const EventList: React.FC = () => {
 					},
 				});
 
+                const updateRawEvents = await suiClient.queryEvents({
+					query: {
+						MoveEventType: updateEventAddress,
+					},
+				});
+
+                console.log(updateRawEvents.data);
+
 				const chatEvents: BotEvent[] = chatRawEvents.data.map(
 					// eslint-disable-next-line
 					(event: any) => ({
@@ -82,9 +91,22 @@ const EventList: React.FC = () => {
 					})
 				);
 
+                const updateEvents: BotEvent[] = updateRawEvents.data.map(
+					// eslint-disable-next-line
+					(event: any) => ({
+						type: "update",
+						message: "Someone update the bot!",
+						from: "",
+						timestamp: dayjs(
+							parseInt(event.timestampMs, 10)
+						).format("YYYY-MM-DD HH:mm:ss"),
+					})
+				);
+
 				const allEvents: BotEvent[] = [
 					...chatEvents,
 					...donateEvents,
+					...updateEvents,
 				].sort((a, b) =>
 					dayjs(a.timestamp).isBefore(dayjs(b.timestamp)) ? -1 : 1
 				);
