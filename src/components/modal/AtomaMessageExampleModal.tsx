@@ -35,6 +35,10 @@ const AtomaMessageExampleModal: React.FC<Props> = ({
 	});
 
 	const handleCreate = () => {
+		if (!question || !inputText) {
+			toast.error("Please fill all the fields!");
+			return;
+		}
 		setOutputText("Generating response...");
 		const modifyText = `Question is: ${question}. prompt is: ${inputText}. Then create an answer`;
 		atomaMutation.mutate(modifyText);
@@ -165,7 +169,11 @@ const AtomaMessageExampleModal: React.FC<Props> = ({
 										? "bg-gray-500 cursor-not-allowed"
 										: "bg-blue-500 hover:bg-blue-600 hover:shadow-[0_0_10px_rgba(58,110,165,1)]"
 								}`}
-								disabled={atomaMutation.isPending}
+								disabled={
+									atomaMutation.isPending ||
+									!outputText ||
+									!question
+								}
 							>
 								Submit
 							</button>

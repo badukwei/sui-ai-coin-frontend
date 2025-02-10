@@ -30,6 +30,10 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 	});
 
 	const handleCreate = () => {
+		if (!inputText) {
+			toast.error("Please fill all the fields!");
+			return;
+		}
 		setOutputText("Generating response...");
 		atomaMutation.mutate(inputText);
 	};
