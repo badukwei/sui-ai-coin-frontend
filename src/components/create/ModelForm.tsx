@@ -23,7 +23,9 @@ interface Props {
 }
 
 const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
-	const [config, setConfig] = useState(defaultConfig);
+	const [config, setConfig] = useState<AIConfig>(defaultConfig);
+	const [originalConfig, setOriginalConfig] =
+		useState<AIConfig>(defaultConfig);
 	const [coinData, setCoinData] = useState<CoinMetadata | null>(null);
 	const [botData, setBotData] = useState<BotInfo | null>(null);
 
@@ -167,6 +169,10 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			toast.error("Please log in with your wallet!");
 			return;
 		}
+		if (JSON.stringify(config) === JSON.stringify(originalConfig)) {
+			toast.error("Please change the fields first!");
+			return;
+		}
 		try {
 			const deleteResponse = await fetch(
 				`${ELIZA_BASE_URL}/agents/${agentId}`,
@@ -254,8 +260,8 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				const botInfo = object.content.fields as unknown as BotInfo;
 				setBotData(botInfo);
 				const botConfig = JSON.parse(botInfo.bot_json) as AIConfig;
-				console.log(botConfig);
 				setConfig(botConfig);
+				setOriginalConfig(botConfig);
 			} catch (error) {
 				console.log(error);
 			}
