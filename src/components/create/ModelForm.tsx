@@ -176,8 +176,9 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			console.log(suiResponse);
 			toast.success(
 				<RoutingToast
-					message="You don't have enough balance!"
+					message="Success update the bot! Thanks for the contribution!"
 					route={`/create/${coinAddress}`}
+					linkMessage="Go to chat"
 				/>,
 				{
 					position: "top-right",

@@ -4,8 +4,9 @@ import React from "react";
 interface Props {
 	message: string;
 	route: string;
+	linkMessage: string;
 }
-const RoutingToast: React.FC<Props> = ({ message, route }) => {
+const RoutingToast: React.FC<Props> = ({ message, route, linkMessage }) => {
 	return (
 		<div>
 			<p>{message}</p>
@@ -13,7 +14,7 @@ const RoutingToast: React.FC<Props> = ({ message, route }) => {
 				href={route}
 				className="text-blue-400 underline hover:text-blue-500"
 			>
-				Deposit more SUI
+				{linkMessage}
 			</Link>
 		</div>
 	);

@@ -28,6 +28,7 @@ const DonateInputModal: React.FC<Props> = ({
 					<RoutingToast
 						message="You don't have enough balance!"
 						route={`/create/${coinAddress}`}
+						linkMessage="Update bot to get token"
 					/>,
 					{
 						position: "top-right",
