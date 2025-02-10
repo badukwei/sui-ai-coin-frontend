@@ -26,7 +26,7 @@ const PostExample: React.FC<Props> = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const handleSubmit = (content: string) => {
-		handleAddArrayItemWithContent("lore", content);
+		handleAddArrayItemWithContent("postExamples", content);
 	};
 	return (
 		<div>
