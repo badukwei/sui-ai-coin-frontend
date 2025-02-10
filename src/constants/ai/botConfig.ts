@@ -43,6 +43,6 @@ export const defaultConfig: AIConfig = {
 };
 
 export const limitPrompt =
-	"!Important: You can generate only one sentence with no more than 120 characters.";
+	"!Important: You can generate only one or two sentence with no more than 200 characters.";
 
 
