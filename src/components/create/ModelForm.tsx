@@ -195,7 +195,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			toast.success(
 				<RoutingToast
 					message="Success update the bot! Thanks for the contribution!"
-					route={`/create/${coinAddress}`}
+					route={`/coin/${coinAddress}`}
 					linkMessage="Go to chat"
 				/>,
 				{
@@ -268,9 +268,9 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			<h2 className="text-2xl font-semibold mb-4">
 				AI Configuration Form
 			</h2>
-			<div className="d-flex flex-col gap-4">
+			<div className="flex flex-col gap-2">
 				{/* Name */}
-				<div>
+				<div className="mt-0">
 					<h3 className="text-lg font-semibold mt-6 mb-2">Name</h3>
 					<input
 						type="text"
@@ -281,7 +281,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				</div>
 
 				{/* Model Provider */}
-				<div>
+				<div className="mt-0">
 					<h3 className="text-lg font-semibold mt-6 mb-2">
 						Model Provider
 					</h3>
@@ -294,7 +294,7 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				</div>
 
 				{/* Voice Model */}
-				<div>
+				<div className="mt-0">
 					<h3 className="text-lg font-semibold mt-6 mb-2">
 						Voice Model
 					</h3>

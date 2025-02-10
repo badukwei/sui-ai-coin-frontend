@@ -29,7 +29,7 @@ const Bio: React.FC<Props> = ({
 		handleAddArrayItemWithContent("bio", content);
 	};
 	return (
-		<div>
+		<div className="mt-4">
 			<div className="flex justify-between items-center mt-6 mb-2">
 				<h3 className="text-lg font-semibold">Bio</h3>
 				<button

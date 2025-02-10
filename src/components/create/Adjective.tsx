@@ -29,7 +29,7 @@ const Adjective: React.FC<Props> = ({
 		handleAddArrayItemWithContent("adjectives", content);
 	};
 	return (
-		<div>
+		<div className="mt-4">
 			<div className="flex justify-between items-center mt-6 mb-2">
 				<h3 className="text-lg font-semibold">Adjectives</h3>
 				<button

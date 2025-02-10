@@ -30,7 +30,7 @@ const MessageExample: React.FC<Props> = ({
 		handleAddWithContentMessageExample(userMessage, botResponse);
 	};
 	return (
-		<div>
+		<div className="mt-4">
 			<h3 className="text-lg font-semibold mt-6 mb-2">
 				Message Examples
 			</h3>
@@ -74,35 +74,32 @@ const MessageExample: React.FC<Props> = ({
 					/>
 
 					{/* Remove Button */}
-					<div className="flex gap-4 mt-2 w-full">
-						<button
-							onClick={() =>
-								handleRemoveMessageExample(pairIndex)
-							}
-							className="flex-1 p-2 rounded text-white transition 
+					<button
+						onClick={() => handleRemoveMessageExample(pairIndex)}
+						className="mt-2 w-full p-2 rounded text-white transition 
                                 bg-red-500 hover:bg-red-600 active:scale-95"
-						>
-							✖
-						</button>
-
-						<button
-							onClick={() => setIsModalOpen(true)}
-							className="flex-1 p-2 rounded text-white transition 
-                                bg-green-500 hover:bg-green-600 active:scale-95"
-						>
-							Create with Atoma AI
-						</button>
-					</div>
+					>
+						✖ Remove Example
+					</button>
 				</div>
 			))}
 
 			{/* Add New Example Pair Button */}
-			<button
-				onClick={handleAddMessageExample}
-				className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-			>
-				+ Add Message Example
-			</button>
+			<div className="flex gap-4 mt-2 w-full">
+				<button
+					onClick={handleAddMessageExample}
+					className="flex-1 p-2 bg-blue-500 text-white rounded"
+				>
+					+ Add Message Example
+				</button>
+				<button
+					onClick={() => setIsModalOpen(true)}
+					className="flex-1 p-2 rounded text-white transition 
+                                bg-green-500 hover:bg-green-600 active:scale-95"
+				>
+					Create with Atoma AI
+				</button>
+			</div>
 
 			<AtomaMessageExampleModal
 				isOpen={isModalOpen}

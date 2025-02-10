@@ -29,7 +29,7 @@ const PostExample: React.FC<Props> = ({
 		handleAddArrayItemWithContent("postExamples", content);
 	};
 	return (
-		<div>
+		<div className="mt-4">
 			<div className="flex justify-between items-center mt-6 mb-2">
 				<h3 className="text-lg font-semibold">Post Examples</h3>
 				<button

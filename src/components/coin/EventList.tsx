@@ -1,5 +1,5 @@
 import {
-    updateEventAddress,
+	updateEventAddress,
 	chatEventAddress,
 	donateEventAddress,
 } from "@/constants/move/store";
@@ -14,27 +14,12 @@ interface BotEvent {
 	timestamp: string;
 }
 
-const EventList: React.FC = () => {
-	const [events, setEvents] = useState<BotEvent[]>([
-		{
-			type: "update",
-			message: "System updated successfully.",
-			from: "123",
-			timestamp: "2025-02-10 14:30",
-		},
-		{
-			type: "donate",
-			message: "User donated 50 SUI!",
-			from: "123",
-			timestamp: "2025-02-10 15:00",
-		},
-		{
-			type: "chat",
-			message: "New chat message received.",
-			from: "132",
-			timestamp: "2025-02-10 15:15",
-		},
-	]);
+interface Props {
+	coinAddress: string;
+}
+
+const EventList: React.FC<Props> = ({ coinAddress }) => {
+	const [events, setEvents] = useState<BotEvent[]>([]);
 
 	const eventStyles: Record<Event["type"], string> = {
 		update: "bg-blue-500/20 border-blue-400 text-blue-300",
@@ -59,49 +44,50 @@ const EventList: React.FC = () => {
 					},
 				});
 
-                const updateRawEvents = await suiClient.queryEvents({
+				const updateRawEvents = await suiClient.queryEvents({
 					query: {
 						MoveEventType: updateEventAddress,
 					},
 				});
 
-                console.log(updateRawEvents.data);
-
-				const chatEvents: BotEvent[] = chatRawEvents.data.map(
+				const chatEvents: BotEvent[] = chatRawEvents.data
 					// eslint-disable-next-line
-					(event: any) => ({
+					.filter((event: any) => event.parsedJson.ca === coinAddress)
+					// eslint-disable-next-line
+					.map((event: any) => ({
 						type: "chat",
-						message: "New chat message send",
+						message: "New chat message send!",
 						from: event.parsedJson.sender,
 						timestamp: dayjs(
 							parseInt(event.timestampMs, 10)
 						).format("YYYY-MM-DD HH:mm:ss"),
-					})
-				);
+					}));
 
-				const donateEvents: BotEvent[] = donateRawEvents.data.map(
+				const donateEvents: BotEvent[] = donateRawEvents.data
 					// eslint-disable-next-line
-					(event: any) => ({
+					.filter((event: any) => event.parsedJson.ca === coinAddress)
+					// eslint-disable-next-line
+					.map((event: any) => ({
 						type: "donate",
-						message: `User donated ${event.parsedJson.donate_amount}`,
+						message: `Someone donated ${event.parsedJson.donate_amount}!`,
 						from: event.parsedJson.donator,
 						timestamp: dayjs(
 							parseInt(event.timestampMs, 10)
 						).format("YYYY-MM-DD HH:mm:ss"),
-					})
-				);
+					}));
 
-                const updateEvents: BotEvent[] = updateRawEvents.data.map(
+				const updateEvents: BotEvent[] = updateRawEvents.data
 					// eslint-disable-next-line
-					(event: any) => ({
+					.filter((event: any) => event.parsedJson.ca === coinAddress)
+					// eslint-disable-next-line
+					.map((event: any) => ({
 						type: "update",
 						message: "Someone update the bot!",
-						from: "",
+						from: event.parsedJson.sender,
 						timestamp: dayjs(
 							parseInt(event.timestampMs, 10)
 						).format("YYYY-MM-DD HH:mm:ss"),
-					})
-				);
+					}));
 
 				const allEvents: BotEvent[] = [
 					...chatEvents,

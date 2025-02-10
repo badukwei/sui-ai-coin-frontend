@@ -1,14 +1,14 @@
 export const storePackageAddress =
-	"0x24def1b43bb0880eff3cee1b51816bad50f2f908181fff7c63f9737605d9b61a";
+	"0xf163a6f8bab6ce837c43051651943e7562a1f793a04cad9c30b3a3ff07736cb2";
 export const configAddress =
-	"0xd146536027c9998992f99107ee349843b4e1ba295bf955f0bc699de5bce64b94";
+	"0x63965b8cf8f6dae21fbf5bf0250347218fff093feeb71afc964223c34321f0ef";
 export const createEventAddress =
-	"0x24def1b43bb0880eff3cee1b51816bad50f2f908181fff7c63f9737605d9b61a::store::CreateBotEvent";
+	"0xf163a6f8bab6ce837c43051651943e7562a1f793a04cad9c30b3a3ff07736cb2::store::CreateBotEvent";
 export const updateEventAddress =
-	"0x24def1b43bb0880eff3cee1b51816bad50f2f908181fff7c63f9737605d9b61a::store::UpdateBotEvent";
+	"0xf163a6f8bab6ce837c43051651943e7562a1f793a04cad9c30b3a3ff07736cb2::store::UpdateBotEvent";
 export const chatEventAddress =
-	"0x24def1b43bb0880eff3cee1b51816bad50f2f908181fff7c63f9737605d9b61a::store::ChatEvent";
+	"0xf163a6f8bab6ce837c43051651943e7562a1f793a04cad9c30b3a3ff07736cb2::store::ChatEvent";
 export const donateEventAddress =
-	"0x24def1b43bb0880eff3cee1b51816bad50f2f908181fff7c63f9737605d9b61a::store::DonateEvent";
+	"0xf163a6f8bab6ce837c43051651943e7562a1f793a04cad9c30b3a3ff07736cb2::store::DonateEvent";
 export const chatFee = 10;
 export const donateFee = 100;

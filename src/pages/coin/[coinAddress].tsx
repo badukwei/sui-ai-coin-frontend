@@ -36,7 +36,9 @@ const CoinPage = () => {
 					coinAddress={normalizedCoinAddress}
 					address={address}
 				/>
-				<EventList />
+				{normalizedCoinAddress && (
+					<EventList coinAddress={normalizedCoinAddress} />
+				)}
 			</main>
 		</div>
 	);
