@@ -3,15 +3,20 @@ import Modal from "@mui/material/Modal";
 import fetchAtoma from "@/utils/ai/atomaAI";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { FiX } from "react-icons/fi"; 
+import { FiX } from "react-icons/fi"; // Import close icon
 
 interface Props {
 	isOpen: boolean;
 	onClose: () => void;
-	handleSubmit: (content: string) => void;
+	handleSubmit: (userMessage: string, botResponse: string) => void;
 }
 
-const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
+const AtomaMessageExampleModal: React.FC<Props> = ({
+	isOpen,
+	onClose,
+	handleSubmit,
+}) => {
+	const [question, setQuestion] = useState("");
 	const [inputText, setInputText] = useState("");
 	const [outputText, setOutputText] = useState("");
 
@@ -31,10 +36,12 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 
 	const handleCreate = () => {
 		setOutputText("Generating response...");
-		atomaMutation.mutate(inputText);
+		const modifyText = `Question is: ${question}. prompt is: ${inputText}. Then create an answer`;
+		atomaMutation.mutate(modifyText);
 	};
 
 	const handleClose = () => {
+		setQuestion("");
 		setInputText("");
 		setOutputText("");
 		onClose();
@@ -52,10 +59,32 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
                                 shadow-[0_0_20px_rgba(58,110,165,0.8)] rounded-lg max-w-3xl w-full 
                                 text-center flex flex-col gap-6"
 				>
-					{/* 🔵 Title */}
+					{/* Title */}
 					<h2 className="text-2xl font-bold text-[#4FC3F7]">
 						Atoma AI Chat
 					</h2>
+
+					{/* User Question Input Field */}
+					<div className="relative">
+						<input
+							type="text"
+							value={question}
+							onChange={(e) => setQuestion(e.target.value)}
+							className="w-full p-3 rounded bg-gray-900 text-white border border-gray-700 
+                                       focus:outline-none focus:ring-2 focus:ring-blue-400"
+							placeholder="Enter user question..."
+						/>
+						{question && (
+							<button
+								onClick={() => setQuestion("")}
+								className="absolute top-2 right-2 p-1 rounded-full bg-gray-700 hover:bg-gray-600 
+                                           text-white transition duration-300"
+								title="Clear question"
+							>
+								<FiX className="text-lg" />
+							</button>
+						)}
+					</div>
 
 					{/* Input Textarea */}
 					<div className="relative">
@@ -65,7 +94,7 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 							className="w-full p-3 rounded bg-gray-900 text-white border border-gray-700 
                                        focus:outline-none focus:ring-2 focus:ring-blue-400"
 							rows={4}
-							placeholder="Enter your text..."
+							placeholder="Enter your prompt..."
 						/>
 						{inputText && (
 							<button
@@ -79,7 +108,7 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 						)}
 					</div>
 
-					{/* Output Box */}
+					{/* 🎯 Output Box */}
 					<div className="relative">
 						<div
 							className="w-full p-3 rounded border border-gray-700 bg-[rgba(255,255,255,0.05)] 
@@ -102,7 +131,7 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 						)}
 					</div>
 
-					{/* Action Buttons */}
+					{/* 🚀 Action Buttons */}
 					<div className="flex justify-center gap-4">
 						<button
 							onClick={handleClose}
@@ -128,7 +157,7 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 						) : (
 							<button
 								onClick={() => {
-									handleSubmit(outputText);
+									handleSubmit(question, outputText);
 									handleClose();
 								}}
 								className={`px-5 py-2 rounded-lg text-white transition-all duration-300 ${
@@ -148,4 +177,4 @@ const AtomaChatModel: React.FC<Props> = ({ isOpen, onClose, handleSubmit }) => {
 	);
 };
 
-export default AtomaChatModel;
+export default AtomaMessageExampleModal;

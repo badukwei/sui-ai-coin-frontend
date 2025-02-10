@@ -15,6 +15,7 @@ import PostExample from "./PostExample";
 import Topic from "./Topic";
 import Adjective from "./Adjective";
 import RoutingToast from "../common/CustomToastMessage/RoutingToast";
+import MessageExample from "./MessageExample";
 
 interface Props {
 	coinAddress: string;
@@ -138,6 +139,23 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 			return { ...prev, messageExamples: updatedExamples };
 		});
 	};
+
+	const handleAddWithContentMessageExample = (
+		userMessage: string,
+		botResponse: string
+	) => {
+		setConfig((prev) => ({
+			...prev,
+			messageExamples: [
+				...prev.messageExamples,
+				[
+					{ user: "{{user1}}", content: { text: userMessage } },
+					{ user: prev.name, content: { text: botResponse } }, 
+				],
+			],
+		}));
+	};
+
 
 	const update = async () => {
 		const agentId = botData?.bot_id;
@@ -311,69 +329,15 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				/>
 
 				{/* Message Examples */}
-				<div>
-					<h3 className="text-lg font-semibold mt-6 mb-2">
-						Message Examples
-					</h3>
-					{config.messageExamples.map((examplePair, pairIndex) => (
-						<div
-							key={pairIndex}
-							className="bg-gray-800 p-4 rounded-lg mb-4"
-						>
-							{/* First User ("{{user1}}") */}
-							<label className="block text-sm text-gray-400">
-								User Prompt:
-							</label>
-							<input
-								type="text"
-								value={examplePair[0].content.text}
-								onChange={(e) =>
-									handleMessageExampleChange(
-										pairIndex,
-										0,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-700 text-white mb-2"
-							/>
-
-							{/* Second User (config.name) */}
-							<label className="block text-sm text-gray-400">
-								Response ({config.name}):
-							</label>
-							<input
-								type="text"
-								value={examplePair[1].content.text}
-								onChange={(e) =>
-									handleMessageExampleChange(
-										pairIndex,
-										1,
-										e.target.value
-									)
-								}
-								className="w-full p-2 rounded bg-gray-700 text-white mb-2"
-							/>
-
-							{/* Remove Button */}
-							<button
-								onClick={() =>
-									handleRemoveMessageExample(pairIndex)
-								}
-								className="p-2 bg-red-500 text-white rounded w-full mt-2"
-							>
-								✖ Remove Message Example
-							</button>
-						</div>
-					))}
-
-					{/* Add New Example Pair Button */}
-					<button
-						onClick={handleAddMessageExample}
-						className="p-2 bg-blue-500 text-white rounded w-full mt-2"
-					>
-						+ Add Message Example
-					</button>
-				</div>
+				<MessageExample
+					config={config}
+					handleMessageExampleChange={handleMessageExampleChange}
+					handleAddMessageExample={handleAddMessageExample}
+					handleRemoveMessageExample={handleRemoveMessageExample}
+					handleAddWithContentMessageExample={
+						handleAddWithContentMessageExample
+					}
+				/>
 
 				{/* Post Examples */}
 				<PostExample
