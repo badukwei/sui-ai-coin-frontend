@@ -1,17 +1,45 @@
 import React, { useState } from "react";
 import Modal from "@mui/material/Modal";
+import { toast } from "react-toastify";
+import RoutingToast from "../common/CustomToastMessage/RoutingToast";
 
 interface Props {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit: (value: number) => void;
+	totalBalance: number;
+	coinAddress?: string;
 }
 
-const DonateInputModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
+const DonateInputModal: React.FC<Props> = ({
+	isOpen,
+	onClose,
+	onSubmit,
+	totalBalance,
+	coinAddress,
+}) => {
 	const [inputValue, setInputValue] = useState<number | "">("");
 
 	const handleSubmit = () => {
 		if (inputValue !== "") {
+			const inputNumber = Number(inputValue);
+			if (inputNumber > totalBalance) {
+				toast.error(
+					<RoutingToast
+						message="You don't have enough balance!"
+						route={`/create/${coinAddress}`}
+					/>,
+					{
+						position: "top-right",
+						autoClose: 2000,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+					}
+				);
+				onClose();
+				return;
+			}
 			onSubmit(Number(inputValue));
 			setInputValue("");
 			onClose();

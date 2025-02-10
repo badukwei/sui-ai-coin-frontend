@@ -14,6 +14,7 @@ import Bio from "./Bio";
 import PostExample from "./PostExample";
 import Topic from "./Topic";
 import Adjective from "./Adjective";
+import RoutingToast from "../common/CustomToastMessage/RoutingToast";
 
 interface Props {
 	coinAddress: string;
@@ -173,7 +174,19 @@ const AIConfigForm: React.FC<Props> = ({ coinAddress, address }) => {
 				signAndExecuteTransaction
 			);
 			console.log(suiResponse);
-			toast.success("Bot updated successfully!");
+			toast.success(
+				<RoutingToast
+					message="You don't have enough balance!"
+					route={`/create/${coinAddress}`}
+				/>,
+				{
+					position: "top-right",
+					autoClose: 2000,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+				}
+			);
 		} catch (error) {
 			console.error(error);
 			toast.error("An error occurred while updating the bot!");

@@ -26,7 +26,10 @@ const CoinModelFormPage = () => {
 				}}
 			>
 				{normalizedCoinAddress && (
-					<CoinInfo coinAddress={normalizedCoinAddress} />
+					<CoinInfo
+						coinAddress={normalizedCoinAddress}
+						address={address}
+					/>
 				)}
 				{normalizedCoinAddress && (
 					<AIConfigForm
