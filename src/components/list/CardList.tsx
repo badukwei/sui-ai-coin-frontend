@@ -24,6 +24,7 @@ const CardList = () => {
 					},
 				});
 
+				// eslint-disable-next-line
 				const parsedMemecoins = data.map((event: any) => ({
 					name: event.parsedJson.name,
 					symbol: event.parsedJson.symbol,

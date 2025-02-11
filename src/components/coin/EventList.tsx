@@ -104,7 +104,7 @@ const EventList: React.FC<Props> = ({ coinAddress }) => {
 		};
 
 		fetchEvents();
-	}, [suiClient]);
+	}, [suiClient, coinAddress]);
 
 	return (
 		<div className="w-full max-w-3xl bg-gray-800 p-6 rounded-lg shadow-lg">
