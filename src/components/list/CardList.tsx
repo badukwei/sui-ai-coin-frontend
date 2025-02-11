@@ -1,6 +1,7 @@
 import { useSuiClient } from "@mysten/dapp-kit";
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
+import { GridLoader } from "react-spinners";
 import CoinCard from "./CoinCard";
 import { MetadataWithTime } from "@/types/move/metadata";
 import { createEventAddress } from "@/constants/move/store";
@@ -9,19 +10,20 @@ const CardList = () => {
 	const [memecoins, setMemecoins] = useState<MetadataWithTime[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-	
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+
 	const suiClient = useSuiClient();
 
 	useEffect(() => {
 		const fetchEvents = async () => {
 			try {
+				setIsLoading(true);
 				const { data } = await suiClient.queryEvents({
 					query: {
 						MoveEventType: createEventAddress,
 					},
 				});
 
-				// eslint-disable-next-line
 				const parsedMemecoins = data.map((event: any) => ({
 					name: event.parsedJson.name,
 					symbol: event.parsedJson.symbol,
@@ -36,13 +38,14 @@ const CardList = () => {
 				setMemecoins(parsedMemecoins);
 			} catch (error) {
 				console.error("Error fetching events:", error);
+			} finally {
+				setIsLoading(false);
 			}
 		};
 
 		fetchEvents();
 	}, [suiClient]);
 
-	// Filtering memecoins based on search query
 	const filteredMemecoins = memecoins
 		.filter(
 			(memecoin) =>
@@ -63,7 +66,6 @@ const CardList = () => {
 		<div className="w-full max-w-6xl mx-auto mt-6">
 			{/* Search & Sorting Section */}
 			<div className="flex flex-wrap items-center justify-between bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-xl mb-6 shadow-lg">
-				{/* Search Box */}
 				<div className="relative flex items-center w-full sm:w-1/3 bg-gray-800 rounded-full p-2">
 					<FaSearch className="absolute left-4 text-gray-400" />
 					<input
@@ -75,7 +77,6 @@ const CardList = () => {
 					/>
 				</div>
 
-				{/* Sort Buttons */}
 				<div className="flex items-center gap-4 mt-4 sm:mt-0">
 					<button
 						onClick={() => setSortOrder("asc")}
@@ -102,16 +103,22 @@ const CardList = () => {
 				</div>
 			</div>
 
-			{/* Responsive Grid Layout */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-				{filteredMemecoins.length > 0 ? (
-					filteredMemecoins.map((memecoin, index) => (
-						<CoinCard key={index} {...memecoin} />
-					))
-				) : (
-					<p className="text-gray-400">No memecoins found.</p>
-				)}
-			</div>
+			{/* Loading Animation */}
+			{isLoading ? (
+				<div className="flex justify-center items-center h-40">
+					<GridLoader size={20} color="#2a2b35" />
+				</div>
+			) : (
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+					{filteredMemecoins.length > 0 ? (
+						filteredMemecoins.map((memecoin, index) => (
+							<CoinCard key={index} {...memecoin} />
+						))
+					) : (
+						<p className="text-gray-400">No memecoins found.</p>
+					)}
+				</div>
+			)}
 		</div>
 	);
 };
