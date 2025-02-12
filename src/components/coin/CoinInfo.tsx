@@ -96,11 +96,11 @@ const CoinInfo: React.FC<CoinInfoProps> = ({ coinAddress, address }) => {
 	const dynamicLink = isCoinRoute
 		? `/create/${coinAddress}`
 		: `/coin/${coinAddress}`;
-	const linkText = isCoinRoute ? "Update AI agent" : "Chat With AI agent";
+	const linkText = isCoinRoute ? "Update AI agent" : "Chat with AI agent";
 
 	return (
 		<div className="relative w-full max-w-3xl bg-gray-800 text-white p-6 rounded-lg text-center shadow-lg">
-			<div className="absolute top-4 right-4">
+			<div className="mb-4 mt-0 flex justify-end">
 				<Link
 					href={dynamicLink}
 					className="px-5 py-2 rounded-lg bg-[rgba(255,255,255,0.1)] text-[#E3F2FD] border border-[rgba(255,255,255,0.2)] 
