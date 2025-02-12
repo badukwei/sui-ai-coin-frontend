@@ -27,16 +27,16 @@ const ErrorModal: React.FC<Props> = ({
           className="p-12 bg-[rgba(10,25,47,0.95)] border border-[rgba(58,110,165,0.8)] shadow-[0_0_20px_rgba(58,110,165,0.8)] 
                     rounded-lg max-w-md w-full text-center flex flex-col gap-6"
         >
-          {/* 🔥 Title with Icon */}
+          {/* Title with Icon */}
           <div className="flex items-center justify-center gap-2 text-[#4FC3F7] font-bold text-xl">
-            <FaExclamationTriangle className="text-yellow-400 text-2xl" />{" "}
+            <FaExclamationTriangle className="text-yellow-400" size={54}/>{" "}
             <span className="text-3xl">{title}</span>
           </div>
 
-          {/* 📝 Error Message */}
+          {/* Error Message */}
           <p className="mt-4 text-[#B0BEC5] text-lg">{errorMessage}</p>
 
-          {/* 🔳 Close Button */}
+          {/* Close Button */}
           <button
             onClick={handleClose}
             className="bg-[rgba(58,110,165,0.8)] text-[#E3F2FD] px-5 py-2 rounded-lg 
