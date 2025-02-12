@@ -3,6 +3,7 @@ import {
 	chatEventAddress,
 	donateEventAddress,
 } from "@/constants/move/store";
+import truncateAddress from "@/utils/move/format/truncateAddress";
 import { useSuiClient } from "@mysten/dapp-kit";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
@@ -129,7 +130,7 @@ const EventList: React.FC<Props> = ({ coinAddress }) => {
 							{/* Only display `from` for update events */}
 							{event.from && (
 								<p className="text-sm opacity-80 text-blue-200">
-									By: {event.from}
+									By: {truncateAddress(event.from)}
 								</p>
 							)}
 
